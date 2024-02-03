@@ -1,0 +1,108 @@
+{
+	map			"mp_aground_ss"
+	longname	"Aground - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
+{
+	map			"mp_aqueduct_ss"
+	longname	"Erosion - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
+{
+	map			"mp_terminal_cls"
+	longname	"Terminal - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
+{
+	map			"mp_cement"
+	longname	"Foundation - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
+{
+	map			"mp_hillside_ss"
+	longname	"Getaway - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
+{
+	map			"mp_italy"
+	longname	"Piazza - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
+{
+	map			"mp_meteora"
+	longname	"Sanctuary - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
+{
+	map			"mp_morningwood"
+	longname	"Black Box - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
+{
+	map			"mp_overwatch"
+	longname	"Overwatch - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
+{
+	map			"mp_park"
+	longname	"Liberation - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
+{
+	map			"mp_qadeem"
+	longname	"Oasis - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
+{
+	map			"mp_restrepo_ss"
+	longname	"Lookout - ^5RETROPACK"
+	gametype	"dm war sab sab2 dom sd sd2 hc thc ctf koth"
+	description "^5RETROPACK DLC FIX"
+	allieschar  "delta_multicam"
+	axischar    "opforce_air"
+	mappack		"27"
+}
