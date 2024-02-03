@@ -3,7 +3,7 @@ MW2 Mod Version: **1.0.2 (_Updated October 21, 2023_)**
 </br>BO1 Mod Version: **0.9.0 (_Updated June 5, 2022_)**
 </br>Ghosts Mod Version: **Alpha (_Unreleased_)**
 </br>
-</br>**Date:** October 21, 2024
+</br>**Date:** October 21, 2023
 </br>**Compatibility:** Modern Warfare 2 (IW4x) / Modern Warfare 3 (PlutoIW5) / Black Ops (Steam/Rekt/PlutoT5) / Ghosts (IW6x)
 </br>
 </br>**Installation:**
