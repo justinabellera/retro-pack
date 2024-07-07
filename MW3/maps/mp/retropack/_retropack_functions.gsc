@@ -1705,8 +1705,8 @@ doBotsShoot()
 				}
 			}
 		}
+		setDvar("testClients_doAttack", 0);
     }
-	setDvar("testClients_doAttack", 0);
 }
 
 doBotsAim()
@@ -3132,8 +3132,19 @@ boltRetro()
 		self.pers["boltTime"] = 3;
 	}
 	self thread RetroBoltSave();
-	self iPrintln("^4Press [{+reload}] to +saveBolt, [{weapnext}] to +delBolt");
-	self iPrintln("^4Press [{+actionslot 1}] to disable tool");
+	self thread boltTextThread();
+}
+
+boltTextThread()
+{
+	self endon("dudestopbolt");
+	while(1)
+	{
+		self iPrintln("^4Press [{+reload}] to +saveBolt, [{weapnext}] to +delBolt");
+		self iPrintln("^4Press [{+actionslot 1}] to disable tool");
+		wait 1;
+	}
+	wait 0.01;
 }
 
 RetroBoltSave()
@@ -5360,6 +5371,11 @@ velocitybind1()
 		self.velobinder = false;
 		self notify("stopvelobind");
 		self iPrintln("Velocity Bind: ^1Off");
+		self.velotext Destroy();
+		self.velotext = createFontString("DEFAULT", 1.0);
+		self.velotext setPoint("LEFT", "CENTER", 80, -85);
+		self.velotext setText("Velocity Bind: ^1Disabled");
+		self.velotext.archived = self.NotStealth;
 	}
 }
 
@@ -5417,6 +5433,11 @@ velocitybind2()
 		self.velobinder = false;
 		self notify("stopvelobind");
 		self iPrintln("Velocity Bind: ^3Off");
+		self.velotext Destroy();
+		self.velotext = createFontString("DEFAULT", 1.0);
+		self.velotext setPoint("LEFT", "CENTER", 80, -85);
+		self.velotext setText("Velocity Bind: ^1Disabled");
+		self.velotext.archived = self.NotStealth;
 	}
 }
 
@@ -5474,6 +5495,11 @@ velocitybind3()
 		self.velobinder = false;
 		self notify("stopvelobind");
 		self iPrintln("Velocity Bind: ^3Off");
+		self.velotext Destroy();
+		self.velotext = createFontString("DEFAULT", 1.0);
+		self.velotext setPoint("LEFT", "CENTER", 80, -85);
+		self.velotext setText("Velocity Bind: ^1Disabled");
+		self.velotext.archived = self.NotStealth;
 	}
 }
 
@@ -5529,6 +5555,11 @@ velocitybind4()
 		self.velobinder = false;
 		self notify("stopvelobind");
 		self iPrintln("Velocity Bind: ^3Off");
+		self.velotext Destroy();
+		self.velotext = createFontString("DEFAULT", 1.0);
+		self.velotext setPoint("LEFT", "CENTER", 80, -85);
+		self.velotext setText("Velocity Bind: ^1Disabled");
+		self.velotext.archived = self.NotStealth;
 	}
 }
 
@@ -5741,11 +5772,6 @@ settingSpeedVelo( retroSpeed )
 	self.VelocityRetro = (self.VelocityRetro * retroSpeed);
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 settingSpeedVelodivide( retroSpeed )
@@ -5753,99 +5779,54 @@ settingSpeedVelodivide( retroSpeed )
 	self.VelocityRetro = (self.VelocityRetro / retroSpeed);
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 northmomentum()
 {
 	self.VelocityRetro = (200, 0, 5);
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 southmomentum()
 {
 	self.VelocityRetro = (-200, 0, 5);
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 eastmomentum()
 {
 	self.VelocityRetro = ((0, -200, 5));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 westmomentum()
 {
 	self.VelocityRetro = ((0, 200, 5));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 northeastmomentum()
 {
 	self.VelocityRetro = ((200, -200, 5));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 southeastmomentum()
 {	
 	self.VelocityRetro = ((-200, -200, 5));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 northwestmomentum()
 {
 	self.VelocityRetro = ((200, 200, 5));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 southwestmomentum()
 {
 	self.VelocityRetro = ((-200, 200, 5));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 
@@ -5854,11 +5835,6 @@ northladder()
 	self.VelocityRetro = (130, 0, -200);
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 southladder()
@@ -5866,11 +5842,6 @@ southladder()
 	self.VelocityRetro = (-130, 0, -200);
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 eastladder()
@@ -5878,11 +5849,6 @@ eastladder()
 	self.VelocityRetro = ((0, -130, -200));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 westladder()
@@ -5890,11 +5856,6 @@ westladder()
 	self.VelocityRetro = ((0, 130, -200));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 NorthWindow()
@@ -5903,12 +5864,6 @@ NorthWindow()
 	self.VelocityRetro = ((300, 0, 260));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
-
 }
 
 southWindow()
@@ -5917,11 +5872,6 @@ southWindow()
 	self.VelocityRetro = (( -300, 0, 260));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 
@@ -5931,11 +5881,6 @@ eastWindow()
 	self.VelocityRetro = (( 0, -300, 260));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 
@@ -5945,11 +5890,6 @@ WestWindow()
 	self.VelocityRetro = (( 0, 300, 260));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 lowNorthWindow()
 {
@@ -5957,11 +5897,6 @@ lowNorthWindow()
 	self.VelocityRetro = ( 300, 0, 200);
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 lowsouthWindow()
@@ -5970,11 +5905,6 @@ lowsouthWindow()
 	self.VelocityRetro = ((-300, 0, 200));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 
@@ -5984,11 +5914,6 @@ loweastWindow()
 	self.VelocityRetro = (( 0, -300, 200));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 
@@ -5998,11 +5923,6 @@ lowWestWindow()
 	self.VelocityRetro = (( 0, 300, 200));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 newindow()
@@ -6011,11 +5931,6 @@ newindow()
 	self.VelocityRetro = (( 250, -250, 250));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 sewindow()
@@ -6024,11 +5939,6 @@ sewindow()
 	self.VelocityRetro = (( -250, -250, 250));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 nwwindow()
@@ -6037,11 +5947,6 @@ nwwindow()
 	self.VelocityRetro = (( 250, 250, 250));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 swwindow()
@@ -6050,11 +5955,6 @@ swwindow()
 	self.VelocityRetro = (( -250, 250, 250));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 stopwindowvelocity()
@@ -6183,11 +6083,6 @@ NorthEdit(number)
 	self.VelocityRetro = ((self.VelocityRetro[0] + number), self.VelocityRetro[1], self.VelocityRetro[2]);
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 SouthEdit(number)
@@ -6195,11 +6090,6 @@ SouthEdit(number)
 	self.VelocityRetro = ((self.VelocityRetro[0] - number), self.VelocityRetro[1], self.VelocityRetro[2]);
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 WestEdit(number)
@@ -6207,11 +6097,6 @@ WestEdit(number)
 	self.VelocityRetro = (self.VelocityRetro[0], (self.VelocityRetro[1] + number), self.VelocityRetro[2]);
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 
@@ -6220,11 +6105,6 @@ EastEdit(number)
 	self.VelocityRetro = (self.VelocityRetro[0], (self.VelocityRetro[1] - number), self.VelocityRetro[2]);
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 UpEdit(number)
@@ -6232,11 +6112,6 @@ UpEdit(number)
 	self.VelocityRetro = (self.VelocityRetro[0], self.VelocityRetro[1], (self.VelocityRetro[2] + number));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 DownEdit(number)
@@ -6244,44 +6119,24 @@ DownEdit(number)
 	self.VelocityRetro = (self.VelocityRetro[0], self.VelocityRetro[1], (self.VelocityRetro[2] - number));
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 ResetNS()
 {
 	self.VelocityRetro = ( 0, self.VelocityRetro[1], self.VelocityRetro[2]);
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 ResetEW()
 {
 	self.VelocityRetro = (self.VelocityRetro[0], 0, self.VelocityRetro[2]);
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 ResetUD()
 {
 	self.VelocityRetro = (self.VelocityRetro[0], self.VelocityRetro[1], 0);
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 }
 
 constantTracker()
@@ -6317,11 +6172,6 @@ setsomeVelo()
 	self.VelocityRetro = self getVelocity();
 	waitframe();
 	self.pers["RetroVelocity"] = self.VelocityRetro;
-	self.velotext Destroy();
-	self.velotext = createFontString("DEFAULT", 1.0);
-	self.velotext setPoint("LEFT", "CENTER", 80, -85);
-	self.velotext setText("Velocity Bind: " + self.VelocityRetro + " ");
-	self.velotext.archived = self.NotStealth;
 	self iPrintLn ("Velocity Tracked: " + self.VelocityRetro + " ");
 }
 
