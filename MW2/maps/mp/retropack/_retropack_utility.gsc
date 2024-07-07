@@ -198,21 +198,21 @@ toStance(p)
 	{
 		p freezeControls(true);
 	}
-    if(p.Stance == "Stand")
-    {
-        p.Stance = "Crouch";
-		p SetStance( "crouch" );
-    }
-    else if(p.Stance == "Crouch")
-    {
-		p.Stance = "Prone";
+	if(p GetStance() == "crouch")
+	{
+		wait 0.02;
 		p SetStance( "prone" );
-    }
-	else if(p.Stance == "Prone")
-    {
-		p.Stance = "Stand";
+	}
+	else if(p GetStance() == "prone")
+	{
+		wait 0.02;
 		p SetStance( "stand" );
-    }
+	}
+	else if(p GetStance() == "stand")
+	{
+		wait 0.02;
+		p SetStance( "crouch" );
+	}
 	self iprintln(p + "'s stance has changed to: ^2" + p.Stance);
 	p iprintln("^1" + self + " has changed your stance");
 }

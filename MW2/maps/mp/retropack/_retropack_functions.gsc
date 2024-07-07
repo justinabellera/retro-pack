@@ -795,6 +795,10 @@ Aimbot(damage,range) //helios port
 		if(self.selecteb == "0")
 		{
 			if ( isSubStr(self getCurrentWeapon(), "cheytac") 
+			|| isSubStr(self getCurrentWeapon(), "barrett") 
+			|| isSubStr(self getCurrentWeapon(), "fal") 
+			|| isSubStr(self getCurrentWeapon(), "m21") 
+			|| isSubStr(self getCurrentWeapon(), "wa2000") 
 			|| isSubStr(self getCurrentWeapon(), "iw5_barrett") 
 			|| isSubStr(self getCurrentWeapon(), "iw5_cheytac") 
 			|| isSubStr(self getCurrentWeapon(), "iw5_msr") 
@@ -824,7 +828,7 @@ Aimbot(damage,range) //helios port
 						{
 							if(distance( aimAt.origin, ExpLocation ) <= range)
 							{	
-								aimAt thread [[level.callbackPlayerDamage]]( self, self, 192020292, 8, doMod, weaponClass, doDesti, (0,0,0), doLoc, 0 );
+								aimAt thread [[level.callbackPlayerDamage]]( self, self, 192020292, 8, doMod, self getCurrentWeapon(), doDesti, (0,0,0), doLoc, 0 );
 							}
 						}
 					//}
@@ -847,7 +851,7 @@ Aimbot(damage,range) //helios port
 					{
 						if(distance( aimAt.origin, ExpLocation ) <= range)
 						{	
-							aimAt thread [[level.callbackPlayerDamage]]( self, self, 192020292, 8, doMod, weaponClass, doDesti, (0,0,0), doLoc, 0 );
+							aimAt thread [[level.callbackPlayerDamage]]( self, self, 192020292, 8, doMod, self getCurrentWeapon(), doDesti, (0,0,0), doLoc, 0 );
 						}
 					}
 				}
