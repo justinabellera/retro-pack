@@ -32,27 +32,9 @@ _setUpMenu(player)
 	self.Menu["Menu"]["Open"] = false;
 	self.Menu["Menu"]["Locked"] = false;
 	self.ToggleTest = false;
-	/*
-	if(!isDefined( self.VelocityRetro ))
-	{
-		self.VelocityRetro = "^1Disabled";
-	}
-	if(!isDefined( self.BoltTextRetro ))
-	{
-		self.BoltTextRetro = "^1Disabled";
-	}
-	if(!isDefined( self.UFOTextRetro ))
-	{
-		self.UFOTextRetro = "^2Enabled";
-	}
-	if(!isDefined( self.EBTextRetro ))
-	{
-		self.EBTextRetro = "^1Disabled";
-	}
-	*/
-	self.MenuMaxSize = 12;
-	self.MenuMaxSizeHalf = 6;
-	self.MenuMaxSizeHalfOne = 7;
+	self.MenuMaxSize = 7;
+	self.MenuMaxSizeHalf = 3;
+	self.MenuMaxSizeHalfOne = 4;
 	player thread _giveMenu(player);
 }
 
@@ -175,37 +157,22 @@ _closeMenu()
 _menuHud()
 {
 	self.menuWidth = 110;
-	self.menuHeight = 200;
+	self.menuHeight = 130;
 	self.scrollerHeight = 7;
 	self.menuX = 0;
-	self.menuY = -50;
 	self.Menu["Title"] = createText("default", 1.35, "CENTER", "CENTER", 0, -140, 1, (1, 1, 1), 1, (0, 0, 0), 0, level.menuHeader); // title
 	self.Menu["Title"].foreground = true;
 	self.Menu["SubHeader"] = createText("default", 1.05, "CENTER", "CENTER", 0, -131, 1, (1, 1, 1), 1, (0, 0, 0), 0, level.menuSubHeader); // title
 	self.Menu["SubHeader"].foreground = true;
-	self.Menu["Credits"] = createText("default", 1, "CENTER", "CENTER", 0, 40, 1, (1, 1, 1), .7, (0, 0, 0), 1, "^7" + level.developer + "^7 - " + level.menuVersion); // credits
+	self.Menu["Credits"] = createText("default", 1, "CENTER", "CENTER", 0, -30, 1, (1, 1, 1), .7, (0, 0, 0), 1, "^7" + level.developer + "^7 - " + level.menuVersion); // credits
 	self.Menu["Credits"].foreground = true;
-	/*
-	self.Menu["Velocity"] = createText("default", 1, "LEFT", "CENTER", 80, -85, 0, (1, 1, 1), 1, (0, 0, 0), 0, "Velocity Bind: " + self.VelocityRetro + " ");
-	self.Menu["Bolt"]= createText("default", 1, "LEFT", "CENTER", 80, -75, 0, (1, 1, 1), 1, (0, 0, 0), 0, "Bolt Movement Bind: " + self.BoltTextRetro + " ");
-	self.Menu["UFO"] = createText("default", 1, "LEFT", "CENTER", 80, -65, 0, (1, 1, 1), 1, (0, 0, 0), 0, "UFO/Teleport Bind: " + self.UFOTextRetro + " ");
-	self.Menu["EB"] = createText("default", 1, "LEFT", "CENTER", 80, -55, 0, (1, 1, 1), 1, (0, 0, 0), 0, "Explosive Bullets: " + self.EBTextRetro + " ");
-	self.Menu["BGBind"] = self createRectangle("LEFT", "CENTER", 80,-55, 157, 75, (0, 0, 0), 0.70, 1, "white");
-	*/
-	self.Menu["BG"] = self createRectangle("CENTER", "CENTER", self.menuX, self.menuY, self.menuWidth, self.menuHeight, (0, 0, 0), 0.70, 0, "white");
-	self.Menu["Scrollbar"] = self createRectangle("CENTER", "CENTER", self.menuX, 100, self.menuWidth, self.scrollerHeight, (1, 1, 1), 1, 1, "white");
+	self.Menu["BG"] = self createRectangle("CENTER", "CENTER", self.menuX, -83, self.menuWidth, self.menuHeight, (0, 0, 0), 0.70, 0, "white");
+	self.Menu["Scrollbar"] = self createRectangle("CENTER", "CENTER", self.menuX, -28, self.menuWidth, self.scrollerHeight, (1, 1, 1), 1, 1, "white");
 	thread ePxmonitor(self,self.Menu["Title"],"Close");
 	thread ePxmonitor(self,self.Menu["SubHeader"],"Close");
 	thread ePxmonitor(self,self.Menu["Credits"],"Close");
 	thread ePxmonitor(self,self.Menu["BG"],"Close");
 	thread ePxmonitor(self,self.Menu["Scrollbar"],"Close");
-	/*
-	thread ePxmonitor(self,self.Menu["BGBind"],"Close");
-	thread ePxmonitor(self,self.Menu["Velocity"],"Close");
-	thread ePxmonitor(self,self.Menu["Bolt"],"Close");
-	thread ePxmonitor(self,self.Menu["UFO"],"Close");
-	thread ePxmonitor(self,self.Menu["EB"],"Close");
-	*/
 }
 
 loadMenu(menu)
@@ -228,12 +195,6 @@ _menuText()
 	self.Menu["Title"] setSafeText(self.Menu[self.Menu["CurrentMenu"]].title);
 	self.Menu["SubHeader"] setSafeText(self.Menu[self.Menu["CurrentMenu"]].subheader);
 	self.Menu["Credits"] setSafeText(self.Menu[self.Menu["CurrentMenu"]].credits);
-	/*
-	self.Menu["Velocity"] = setSafeText(self.Menu[self.Menu["CurrentMenu"]].velo);
-	self.Menu["Bolt"] = setSafeText(self.Menu[self.Menu["CurrentMenu"]].bolt);
-	self.Menu["UFO"]= setSafeText(self.Menu[self.Menu["CurrentMenu"]].ufo);
-	self.Menu["EB"] = setSafeText(self.Menu[self.Menu["CurrentMenu"]].eb);
-	*/
 	self.Menu["Text"] = [];
 	for(i=0;i<self.MenuMaxSize;i++)
 	{
@@ -362,12 +323,6 @@ _recreateTextForOverFlowFix()
 	self.Menu["Title"] setSafeText(self.Menu[self.Menu["CurrentMenu"]].title);
 	self.Menu["SubHeader"] setSafeText(self.Menu[self.Menu["CurrentMenu"]].subheader);
 	self.Menu["Credits"] setSafeText(self.Menu[self.Menu["CurrentMenu"]].credits);
-	/*
-	self.Menu["Velocity"] = setSafeText(self.Menu[self.Menu["CurrentMenu"]].velo);
-	self.Menu["Bolt"] = setSafeText(self.Menu[self.Menu["CurrentMenu"]].bolt);
-	self.Menu["UFO"]= setSafeText(self.Menu[self.Menu["CurrentMenu"]].ufo);
-	self.Menu["EB"] = setSafeText(self.Menu[self.Menu["CurrentMenu"]].eb);
-	*/
 	for(i=0;i<self.Menu[self.Menu["CurrentMenu"]].text.size;i++)
 	{
 		self.Menu["Text"][i] setSafeText(self.Menu[self.Menu["CurrentMenu"]].text[i]);

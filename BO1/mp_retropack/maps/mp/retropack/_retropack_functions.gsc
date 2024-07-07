@@ -1455,8 +1455,19 @@ boltRetro()
 		self.pers["boltTime"] = 3;
 	}
 	self thread RetroBoltSave();
-	self iPrintln("^4Press [{+reload}] to +saveBolt, [{+gostand}] to +delBolt");
-	self iPrintln("^4Press [{+actionslot 1}] to disable tool");
+	self thread boltTextThread();
+}
+
+boltTextThread()
+{
+	self endon("dudestopbolt");
+	while(1)
+	{
+		self iPrintln("^4Press [{+reload}] to +saveBolt, [{weapnext}] to +delBolt");
+		self iPrintln("^4Press [{+actionslot 1}] to disable tool");
+		wait 3.5;
+	}
+	wait 0.01;
 }
 
 RetroBoltSave()
