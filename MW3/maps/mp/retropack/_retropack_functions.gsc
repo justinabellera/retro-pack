@@ -3142,7 +3142,7 @@ boltTextThread()
 	{
 		self iPrintln("^4Press [{+reload}] to +saveBolt, [{weapnext}] to +delBolt");
 		self iPrintln("^4Press [{+actionslot 1}] to disable tool");
-		wait 1;
+		wait 2.5;
 	}
 	wait 0.01;
 }
