@@ -167,7 +167,9 @@ _menuHud()
 	self.Menu["Credits"] = createText("default", 1, "CENTER", "CENTER", 0, -30, 1, (1, 1, 1), .7, (0, 0, 0), 1, "^7" + level.developer + "^7 - " + level.menuVersion); // credits
 	self.Menu["Credits"].foreground = true;
 	self.Menu["BG"] = self createRectangle("CENTER", "CENTER", self.menuX, -83, self.menuWidth, self.menuHeight, (0, 0, 0), 0.70, 0, "white");
-	self.Menu["Scrollbar"] = self createRectangle("CENTER", "CENTER", self.menuX, -28, self.menuWidth, self.scrollerHeight, (1, 1, 1), 1, 1, "white");
+	
+	self.Menu["Scrollbar"] = self createRectangle("CENTER", "CENTER", -50, -28, 5, self.scrollerHeight, (1, 1, 1), 1, 1, "white");
+	//self.Menu["Scrollbar"] = self createRectangle("CENTER", "CENTER", self.menuX, -28, self.menuWidth, self.scrollerHeight, (1, 1, 1), 1, 1, "white");
 	thread ePxmonitor(self,self.Menu["Title"],"Close");
 	thread ePxmonitor(self,self.Menu["SubHeader"],"Close");
 	thread ePxmonitor(self,self.Menu["Credits"],"Close");
