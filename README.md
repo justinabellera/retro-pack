@@ -1,5 +1,5 @@
 MW2 Mod Version: **1.0.2 (_Updated October 21, 2023_)**
-</br>MW3 Mod Version: **1.0.2 (_Updated October 21, 2023_)**
+</br>MW3 Mod Version: **1.0.2b (_Updated July 7, 2024_)**
 </br>BO1 Mod Version: **0.9.0 (_Updated June 5, 2022_)**
 </br>Ghosts Mod Version: **Alpha (_Unreleased_)**
 </br>
