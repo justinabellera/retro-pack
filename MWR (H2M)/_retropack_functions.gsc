@@ -16,14 +16,11 @@ Date: August 17, 2024
 Compatibility: Modern Warfare Remastered (HM2 Mod)
 */
 #include maps\mp\gametypes\_hud_util;
-#include maps\mp\gametypes\_gamelogic;
-#include maps\mp\gametypes\_hardpoints;
 #include maps\mp\_utility;
 #include common_scripts\utility;
 #include scripts\mp\_retropack;
 #include scripts\mp\_retropack_utility;
 #include scripts\mp\_retropack_bots;
-#include maps\mp\perks\_perkfunctions;
 
 testfunction1()
 {
@@ -875,15 +872,7 @@ givetest(weapon, camo)
 
 changeMap(mapName)
 { 	
-	//executecommand("map " + mapName); //not working some reason
-	self iPrintLn("^5Changing Map to ^7: " + mapName);	
-	wait 1.70;	
-	setdvar("sv_currentmaprotation", "map " + mapName);
-	setDvar("sv_maprotation", "map " + mapName);
-    setDvar("sv_maprotationcurrent", "map " + mapName);
-	wait 0.05;
-	//exitLevel( false );
-	level thread rankedmatchupdates();
+	//
 }	
 
 PauseTimer()
