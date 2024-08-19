@@ -11,8 +11,8 @@
  | |                          __/ |     
  |_|                         |___/   
 
-Version: 0.9.0
-Date: August 17, 2024
+Version: 0.9.1
+Date: August 18, 2024
 Compatibility: Modern Warfare Remastered (HM2 Mod)
 */
 #include maps\mp\gametypes\_hud_util;
@@ -57,9 +57,12 @@ doClassChange()
 			self maps\mp\gametypes\_class::setClass( self.pers["class"]);
 			self maps\mp\gametypes\_class::giveloadout(self.pers["team"],self.pers["class"]);
 			self maps\mp\gametypes\_class::applyloadout();
-			self maps\mp\_utility::giveperk("specialty_longersprint");
-			self maps\mp\_utility::giveperk("specialty_fastsprintrecovery");
-			self maps\mp\_utility::giveperk("specialty_falldamage");
+			if(self.tsperk == 1)
+			{
+				self maps\mp\_utility::giveperk("specialty_longersprint");
+				self maps\mp\_utility::giveperk("specialty_fastsprintrecovery");
+				self maps\mp\_utility::giveperk("specialty_falldamage");
+			}
 			oldclass = self.pers["class"];
 		}
   		wait 0.1;
@@ -100,13 +103,13 @@ doAmmo()
 
 removedeathbarrier()
 {
-	//self iPrintln("Death Barriers: ^1[Removed]");
 	ents = getEntArray();
     for ( index = 0; index < ents.size; index++ )
     {
         if(isSubStr(ents[index].classname, "trigger_hurt"))
         ents[index].origin = (0, 0, 9999999);
 	}
+	self iPrintln("Death Barriers: ^1[Removed]");
 }
 
 monitorRounds()
@@ -280,6 +283,95 @@ loadBotSpawnEnemy()
 		}
 	}
 }
+		
+ToggleTSPerks()
+{
+	if(self.tsperk == 1)
+	{
+		self.tsperk = 0;
+		self maps\mp\_utility::_unsetperk("specialty_longersprint");
+		self maps\mp\_utility::_unsetperk("specialty_fastsprintrecovery");
+		self maps\mp\_utility::_unsetperk("specialty_falldamage");
+		self iPrintln("^5Commando ^7& ^5Marathon ^7Perks: ^1[Removed]");
+		
+	}
+	else if(self.tsperk == 0)
+	{
+		self.tsperk = 1;
+		self maps\mp\_utility::giveperk("specialty_longersprint");
+		self maps\mp\_utility::giveperk("specialty_fastsprintrecovery");
+		self maps\mp\_utility::giveperk("specialty_falldamage");
+		self iPrintln("^5Commando ^7& ^5Marathon ^7Perks: ^2[Given]");
+	}
+}
+
+ToggleBotFreeze(team)
+{
+	name = undefined;
+	if (team == "allies")
+		name = "^2Friendly^7 ";
+	else if (team == "axis")
+		name = "^1Enemy^7 ";
+	
+	if(self.botfreeze == 1)
+	{
+		self.botfreeze = 0;
+		self thread FreezeBot(team, "Unfreeze");
+		self iPrintln(name + "^1Bots: ^2[Unfrozen]");
+	}
+	else if(self.botfreeze == 0)
+	{
+		self.botfreeze = 1;
+		self thread FreezeBot(team, "Freeze");
+		self iPrintln(name + "^1Bots: ^1[Frozen]");
+	}
+}
+
+FreezeBot(botteam, freeze)
+{
+	for(i = 0; i < level.players.size; i++)
+	{
+		if (isSubStr( level.players[i].guid, "bot"))
+		{
+			if(botteam == "allies")
+			{
+				if(level.players[i].pers["team"] == self.pers["team"])
+				{
+					if (isSubStr( level.players[i].guid, "bot"))
+					{
+						if (freeze == "Freeze")
+						{
+							level.players[i] freezeControls(true);
+							level.players[i].pers["freeze"] = true;
+						}
+						else if (freeze == "Unfreeze")
+						{
+							level.players[i] freezeControls(false);
+							level.players[i].pers["freeze"] = false;
+						}
+					}
+				}
+			}
+			else if(botteam == "axis")
+			{
+				if(level.players[i].pers["team"] != self.pers["team"])
+				{
+					if (freeze == "Freeze")
+					{
+						level.players[i] freezeControls(true);
+						level.players[i].pers["freeze"] = true;
+					}
+					else if (freeze == "Unfreeze")
+					{
+						level.players[i] freezeControls(false);
+						level.players[i].pers["freeze"] = false;
+					}
+				}
+			}
+		}
+		wait 0.01;
+	}
+}
 
 ToggleSpawnBinds()
 {
@@ -300,7 +392,6 @@ ToggleSpawnBinds()
 
 ToggleEbSelector()
 {
-	self endon ("death");
 	self endon ("disconnect");
 	wait 0.05;
 	if (self.selecteb == "0")
@@ -330,6 +421,14 @@ ToggleEbSelector()
 AimbotStrength()
 {
 	if(self.AimbotRange == "^1Off")
+	{
+		self notify("NewRange");
+		self.claymoreeb = undefined;
+		self.c4eb = undefined;
+		self thread Aimbot(2147483600,200);
+		self.AimbotRange = "^2Normal";
+	}
+	else if(self.AimbotRange == "^2Normal")
 	{
 		self notify("NewRange");
 		self.claymoreeb = undefined;
@@ -893,7 +992,7 @@ PauseTimer()
 
 pickupradius()
 {
-	if ( self.puradius == true )
+	if ( self.puradius == false )
 	{
 		self.puradius = true;
 		setDvar( "player_useRadius", 9999 );
@@ -902,7 +1001,7 @@ pickupradius()
     else if ( self.puradius == true )
 	{
 		self.puradius = false;
-		setDvar( "player_useRadius", 150 );
+		setDvar( "player_useRadius", 128 );
 		self iPrintln("Pickup Radius: ^1[Default]");
 	}
 }
@@ -919,6 +1018,50 @@ FastRestart()
 	wait 1;
 	map_restart(false);
 }
+
+FastLast()
+{
+	if(getDvar("g_gametype") == "dm")
+	{
+		destroyHud();
+		destroyMenuText();
+		self.menu.isOpen = false;
+		self notify("stopmenu_up");
+		self notify("stopmenu_down");
+		wait 0.05;
+		self.score = 29;
+		self.pers["score"] = 29;		
+		self.kills = 29;
+		self.pers["kills"] = 29;
+		self freezeControls(true);
+		self iPrintlnBold("^2YOU'RE ON LAST");
+		wait 1;
+		self freezeControls(false);
+	}
+	else if(getDvar("g_gametype") == "war")
+	{
+		destroyHud();
+		destroyMenuText();
+		self.menu.isOpen = false;
+		self notify("stopmenu_up");
+		self notify("stopmenu_down");
+		wait 0.05;
+		setTeamScore( self.team, 74 );
+		self.kills = 74;
+		self.score = 7400;
+		game["teamScores"][self.team] = 74;
+		self freezeControls(true);
+		self iPrintlnBold("^2YOU'RE ON LAST");
+		wait 1;
+		self freezeControls(false);
+	}
+	else
+	{
+		self iPrintln("^1This gamemode is NOT supported for Fast Last");
+	}
+	wait 0.01;
+}
+
 
 EMPBind()
 {
@@ -1075,7 +1218,6 @@ lookAtBot()
 knifeLunge()
 {
 	self endon("disconnect");
-	self endon("death");
 	self endon("knifeLunge0");
 	if(!self.knifelunge)
 	{
@@ -1202,7 +1344,6 @@ _spawn_bot(count, team, callback, stopWhenFull, notifyWhenDone, difficulty)
 //////////////////////////////////////////////////////// BOLT STUFF ////////////////////////////////////////////////////////
 boltRetro()
 {
-	self endon("death");
     self endon("disconnect");
 	self endon("dudestopbolt");
 	if ( !isDefined( self.pers["poscountBolt"] ) )

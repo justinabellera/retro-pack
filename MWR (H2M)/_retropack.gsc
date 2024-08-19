@@ -11,8 +11,8 @@
  | |                          __/ |     
  |_|                         |___/   
 
-Version: 0.9.0
-Date: August 17, 2024
+Version: 0.9.1
+Date: August 18, 2024
 Compatibility: Modern Warfare Remastered (HM2 Mod)
 */
 
@@ -38,17 +38,16 @@ init()
 		setDvar( "bots_manage_add", 1 );
 	level thread addBots_();
 	
-	level.rankedmatch = 1;
 	level.menuName = "Retro Package"; //spawn in text menu name	
 	level.menuHeader = "RETRO PACK"; //in-game menu header	
 	level.menuSubHeader = "^5MWR: H2M"; //in-game menu subheader	
-	level.menuVersion = "0.9.0"; //menu version	
+	level.menuVersion = "0.9.1"; //menu version	
 	level.developer = "@rtros";
 	level thread onplayerconnect();
 	level thread monitorRounds();
-	replaceFunc(maps\mp\gametypes\_teams::getteamshortname, ::getteamshortname_); //custom team names
+	level.prematch_done_time = 0;
 	replaceFunc(maps\mp\_events::firstbloodevent, ::firstbloodevent_); //remove first blood
-	game["strings"]["change_class"] = undefined;
+	replaceFunc(maps\mp\gametypes\_teams::getteamshortname, ::getteamshortname_); //custom team names
 }
 
 onplayerconnect()
@@ -56,6 +55,7 @@ onplayerconnect()
     for(;;)
     {
         level waittill("connected", player);
+		
         player thread onplayerspawned();
         player thread initmenu();
         player thread watchDeath();
@@ -74,10 +74,20 @@ onplayerspawned()
 		if (isSubStr( self.guid, "bot" ))
 		{
 			self thread loadBotSpawn();
-			self thread monitorBot();
+			if(getDvar("g_gametype") == "sd")
+			{
+				maps\mp\_utility::gameflagwait( "prematch_done" );
+				wait 0.01;
+				self freezeControls(true);
+			}
+			if(self.pers["freeze"] == true)
+				self freezeControls(true);
+			else
+				self freezeControls(false);			
 		}
 		else
 		{
+			self freezeControls(false);
 			if (self.pers["loc"] == true) 
 			{
 				self setOrigin( self.pers["savePos"] );
@@ -86,9 +96,12 @@ onplayerspawned()
 			wait 0.02;
 			self iprintln("^5" + level.menuName + " " + level.menuVersion);
 			self iprintln("^5To open menu press [{+speed_throw}] + [{+Actionslot 1}]");
-			self maps\mp\_utility::giveperk("specialty_longersprint");
-			self maps\mp\_utility::giveperk("specialty_fastsprintrecovery");
-			self maps\mp\_utility::giveperk("specialty_falldamage");
+			if(self.tsperk == undefined || self.tsperk == 1)
+			{
+				self maps\mp\_utility::giveperk("specialty_longersprint");
+				self maps\mp\_utility::giveperk("specialty_fastsprintrecovery");
+				self maps\mp\_utility::giveperk("specialty_falldamage");
+			}
 			self thread doClassChange();
 			if(self ishost())
 			{
@@ -98,7 +111,6 @@ onplayerspawned()
 		setDvar( "timescale", 1.0 );
 		self thread monitorGrenade();
 		self thread doAmmo();
-		self thread removedeathbarrier();
 		self thread doRandomTimerPause();
     }
 }
@@ -175,16 +187,6 @@ getteamshortname_( team )
 		return "^5Players";
 }
 
-monitorBot()
-{
-	self endon ("botsAim");
-	for(;;)
-	{
-		self freezeControls(true);
-		wait 0.01;
-	}
-}
-
 monitorGrenade() 
 {
 	self endon( "disconnect" );
@@ -206,13 +208,6 @@ monitorGrenade()
 		{
 			self giveMaxAmmo( weaponName );
 		}
-		/*
-		if( weaponName == "flare_mp" ) 
-		{
-			wait 0.25;
-			self maps\mp\perks\_perks::givePerk( "throwingknife_mp" );
-		}
-		*/
 		wait 0.25;
 	}
 }
@@ -433,16 +428,19 @@ menu()
     addNewOption("main", 5, "Killstreaks ^5Menu", ::loadMenu, "ks"); 
     addNewOption("main", 6, "Bot ^5Menu", ::loadMenu, "bots"); 
 	addNewOption("main", 7, "Lobby ^5Menu", ::loadMenu, "lobby"); //99% done         -- just need "change map function"
-	addNewOption("main", 8, "Players ^5Menu", ::loadMenu, "player"); //done
+	addNewOption("main", 8, "Players ^5Menu", ::loadMenu, "player");
 	
 	addNewMenu("jewstun", "main"); //Jewstun's Backpack
-	addNewOption("jewstun", 0, "EB Only For", ::ToggleEbSelector);
+	addNewOption("jewstun", 0, "EB Only For:", ::ToggleEbSelector);
     addNewOption("jewstun", 1, "Toggle ^5Explosive Bullets", ::AimbotStrength);
 	addNewOption("jewstun", 2, "Toggle ^5UFO/Teleport Binds", ::ToggleSpawnBinds);
 	addNewOption("jewstun", 3, "Toggle ^5Auto-Prone", ::autoProne);
 	addNewOption("jewstun", 4, "Toggle ^5Soft Lands", ::Softlands);
-	addNewOption("jewstun", 5, "Save Location", ::doSaveLocation);
-	addNewOption("jewstun", 6, "Load Location", ::doLoadLocation);
+	addNewOption("jewstun", 5, "Toggle ^5Commando/Marathon", ::ToggleTSPerks);
+	addNewOption("jewstun", 6, "Fast Last", ::FastLast);
+	addNewOption("jewstun", 7, "Remove Death Barriers", ::removedeathbarrier);
+	addNewOption("jewstun", 8, "Save Location", ::doSaveLocation);
+	addNewOption("jewstun", 9, "Load Location", ::doLoadLocation);
 	
     addNewMenu("trickshot", "main"); //Trickshot Menu
 	addNewOption("trickshot", 0, "Bots EMP Bind", ::EMPBind);
@@ -1083,29 +1081,31 @@ menu()
 	addNewOption("ks", 6, "Give ^5Attack Helicopter", ::streak, "helicopter_mp"); 
     addNewOption("ks", 7, "Give ^5Harrier Strike", ::streak, "harrier_airstrike_mp"); 
 	addNewOption("ks", 8, "Give ^5Pavelow", ::streak, "pavelow_mp");
-    addNewOption("ks", 9, "Give ^5Stealth Bomber", ::streak, "stealth_airstrike_mp"); 
-    addNewOption("ks", 10, "Give ^5Chopper Gunner", ::streak, "chopper_gunner_mp"); 
-    addNewOption("ks", 11, "Give ^5AC130", ::streak, "ac130_mp"); 
-    addNewOption("ks", 12, "Give ^5EMP", ::streak, "emp_mp"); 
-    addNewOption("ks", 13, "Give ^5Tactical Nuke", ::streak, "nuke_mp"); 
-	//addNewOption("ks", 14, "Give ^5Emergency Airdrop", ::streak, "harrier_airstrike_mp"); /////////////
+	addNewOption("ks", 9, "Give ^5Emergency Airdrop", ::streak, "airdrop_mega_marker_mp");
+    addNewOption("ks", 10, "Give ^5Stealth Bomber", ::streak, "stealth_airstrike_mp"); 
+    addNewOption("ks", 11, "Give ^5Chopper Gunner", ::streak, "chopper_gunner_mp"); 
+    addNewOption("ks", 12, "Give ^5AC130", ::streak, "ac130_mp"); 
+    addNewOption("ks", 13, "Give ^5EMP", ::streak, "emp_mp"); 
+    addNewOption("ks", 14, "Give ^5Tactical Nuke", ::streak, "nuke_mp"); 
 	
 	addNewMenu("bots", "main"); //Bots Menu
 	addNewOption("bots", 0, "^1Enemy ^7Bots ^5Menu", ::loadMenu, "enemyBots");
 	addNewOption("bots", 1, "^2Friendly ^7Bots ^5Menu", ::loadMenu, "friendlyBots");
 	
 	addNewMenu("enemyBots", "bots"); 
-	addNewOption("enemyBots", 0, "^7Spawn ^1Enemy ^7Bot", ::Spawn_Bot, getOtherTeam(self.team));
-	addNewOption("enemyBots", 1, "^1Kick All Enemy Bots", ::KickBotsEnemy);
-	addNewOption("enemyBots", 2, "^1Enemy Bots to Crosshairs", ::TeleportBotEnemy);
-	addNewOption("enemyBots", 3, "^1Enemy Bots to You", ::ToggleBotSpawnEnemy);
-	//addNewOption("enemyBots", 4, "^1Toggle Enemy Bots Stance", ::StanceBotsEnemy);
+	addNewOption("enemyBots", 0, "^1Spawn Enemy Bot", ::Spawn_Bot, getOtherTeam(self.team));
+	addNewOption("enemyBots", 1, "^1Freeze^7/^2Unfreeze ^1Bots", ::ToggleBotFreeze, "axis");
+	addNewOption("enemyBots", 2, "^1Kick All Enemy Bots", ::KickBotsEnemy);
+	addNewOption("enemyBots", 3, "^1Enemy Bots to Crosshairs", ::TeleportBotEnemy);
+	addNewOption("enemyBots", 4, "^1Enemy Bots to You", ::ToggleBotSpawnEnemy);
+	//addNewOption("enemyBots", 5, "^1Toggle Enemy Bots Stance", ::StanceBotsEnemy);
 	
 	addNewMenu("friendlyBots", "bots"); 
-	addNewOption("friendlyBots", 0, "^7Spawn ^2Friendly ^7Bot", ::Spawn_Bot, self.team);
-	addNewOption("friendlyBots", 1, "^2Kick All Friendly Bots", ::KickBotsFriendly);
-	addNewOption("friendlyBots", 2, "^2Friendly Bots to Crosshairs", ::TeleportBotFriendly);
-	addNewOption("friendlyBots", 3, "^2Friendly Bots to You", ::ToggleBotSpawnFriendly);
+	addNewOption("friendlyBots", 0, "^2Spawn Friendly Bot", ::Spawn_Bot, self.team);
+	addNewOption("friendlyBots", 1, "^1Freeze^7/^2Unfreeze Bots", ::ToggleBotFreeze, "allies");
+	addNewOption("friendlyBots", 2, "^2Kick All Friendly Bots", ::KickBotsFriendly);
+	addNewOption("friendlyBots", 3, "^2Friendly Bots to Crosshairs", ::TeleportBotFriendly);
+	addNewOption("friendlyBots", 4, "^2Friendly Bots to You", ::ToggleBotSpawnFriendly);
 	//addNewOption("friendlyBots", 4, "^2Toggle Friendly Bots Stance", ::StanceBotsFriendly);
 	
 	addNewMenu("lobby", "main"); //Lobby Menu
@@ -1115,6 +1115,7 @@ menu()
 	addNewOption("lobby", 2, "Reset Rounds", ::roundreset);
     addNewOption("lobby", 3, "Fast Restart", ::FastRestart);
 	
+	/*
 	addNewMenu("map menu", "lobby");
 	addNewOption("map menu", 0, "^5MW2 ^7(2019)", ::loadMenu, "mw2 2019");
 	addNewOption("map menu", 1, "^5MW2^7: Campaign Remastered", ::loadMenu, "mw2cr");
@@ -1180,6 +1181,7 @@ menu()
 	addNewOption("mw2r", 18, "Winter Crash", ::changeMap, "mp_crash_snow");
 	addNewOption("mw2r", 19, "Day Break", ::changeMap, "mp_farm_spring");
 	addNewOption("mw2r", 20, "Beach Bog", ::changeMap, "mp_bog_summer");
+	*/
 		
 	addNewMenu("player", "main"); //Player Menu
 	for(i=0;i<level.players.size;i++)
@@ -1190,6 +1192,7 @@ menu()
 		addNewOption(level.players[i].name, 1, "Player to You", ::toYou, level.players[i]);
 		addNewOption(level.players[i].name, 2, "Kick Player", ::toKick, level.players[i]);
 		addNewOption(level.players[i].name, 3, "Kill Player", ::toKill, level.players[i]);
+		addNewOption(level.players[i].name, 4, "(Un)Freeze Player", ::toFreeze, level.players[i]);
 		//addNewOption(level.players[i].name, 4, "Change Player Stance", ::toStance, level.players[i]);
 	}
 }
@@ -1308,7 +1311,6 @@ doBinds()
 bindLocations() 
 {
 	self endon("disconnect");
-	self endon("death");
 	self endon("endtog"); 
 	self endon ("endbinds");
 	self notifyOnPlayerCommand("locsave", "+actionslot 2");
@@ -1332,7 +1334,6 @@ bindLocations()
 bindUFO()
 {
         self endon("disconnect");
-		self endon("death");
 		self endon ("endbinds");
         if(isdefined(self.newufo))
         self.newufo delete();
@@ -1388,7 +1389,6 @@ bindUFO()
 bindTeleportBots() 
 {
 	self endon("disconnect");
-	self endon("death");
 	self endon("endtog"); 
 	self endon ("endbinds");
 	self notifyOnPlayerCommand("bottele", "+actionslot 3");

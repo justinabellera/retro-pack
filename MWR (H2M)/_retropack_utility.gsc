@@ -11,8 +11,8 @@
  | |                          __/ |     
  |_|                         |___/   
 
-Version: 0.9.0
-Date: August 17, 2024
+Version: 0.9.1
+Date: August 18, 2024
 Compatibility: Modern Warfare Remastered (HM2 Mod)
 */
 #include maps\mp\gametypes\_hud_util;
@@ -184,6 +184,24 @@ toKill(p)
 	p suicide();
 	self iPrintln("^7" + p.name + " ^1Killed");
 	p iprintln("^1" + self + " has killed you");
+}
+
+toFreeze(p)
+{
+	if(p.freezeClient == 1)
+	{
+		p.freezeClient = 0;
+		p freezeControls(true);
+		p iPrintln("You were ^1Frozen ^7by " + self);
+		self iPrintln("You ^1Froze ^7" + p.name);
+	}
+	else if(p.freezeClient == 0)
+	{
+		p.freezeClient = 1;
+		p freezeControls(false);
+		p iPrintln("You were ^2Unfrozen ^7by " + self);
+		self iPrintln("You ^2Unfroze ^7" + p.name);
+	}
 }
 
 toKick(p)

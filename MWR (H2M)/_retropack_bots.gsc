@@ -11,8 +11,8 @@
  | |                          __/ |     
  |_|                         |___/   
 
-Version: 0.9.0
-Date: August 17, 2024
+Version: 0.9.1
+Date: August 18, 2024
 Compatibility: Modern Warfare Remastered (HM2 Mod)
 */
 
