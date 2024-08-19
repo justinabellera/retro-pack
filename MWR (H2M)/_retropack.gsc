@@ -74,6 +74,7 @@ onplayerspawned()
 		if (isSubStr( self.guid, "bot" ))
 		{
 			self thread loadBotSpawn();
+			self maps\mp\_utility::giveperk("specialty_falldamage");
 			if(getDvar("g_gametype") == "sd")
 			{
 				maps\mp\_utility::gameflagwait( "prematch_done" );
@@ -107,11 +108,11 @@ onplayerspawned()
 			{
 				//add host only stuff here
 			}
+			self thread monitorGrenade();
+			self thread doAmmo();
+			self thread doRandomTimerPause();
 		}
 		setDvar( "timescale", 1.0 );
-		self thread monitorGrenade();
-		self thread doAmmo();
-		self thread doRandomTimerPause();
     }
 }
 
@@ -255,18 +256,20 @@ doRandomTimerPause()
 initmenu()
 {
 	self endon("disconnect");
-	
-	level.result = 1;
-	self.MainX = -100;
-	self.MainY = -110;
-	self.MenuMaxSize = 7;
-	self.MenuMaxSizeHalf = 3;
-	self.MenuMaxSizeHalfOne = 4;
-	
-    self.menu = spawnStruct();
-    self.hud = spawnStruct();
-    self.menu.isOpen = false;
-    self thread buttons();
+	if (!isSubStr( self.guid, "bot" ))
+	{
+		level.result = 1;
+		self.MainX = -100;
+		self.MainY = -110;
+		self.MenuMaxSize = 7;
+		self.MenuMaxSizeHalf = 3;
+		self.MenuMaxSizeHalfOne = 4;
+		
+		self.menu = spawnStruct();
+		self.hud = spawnStruct();
+		self.menu.isOpen = false;
+		self thread buttons();
+	}
 }
 
 loadMenu(menu)
@@ -437,7 +440,7 @@ menu()
 	addNewOption("jewstun", 3, "Toggle ^5Auto-Prone", ::autoProne);
 	addNewOption("jewstun", 4, "Toggle ^5Soft Lands", ::Softlands);
 	addNewOption("jewstun", 5, "Toggle ^5Commando/Marathon", ::ToggleTSPerks);
-	addNewOption("jewstun", 6, "Fast Last", ::FastLast);
+	addNewOption("jewstun", 6, "Fast Last (2 Piece)", ::FastLast);
 	addNewOption("jewstun", 7, "Remove Death Barriers", ::removedeathbarrier);
 	addNewOption("jewstun", 8, "Save Location", ::doSaveLocation);
 	addNewOption("jewstun", 9, "Load Location", ::doLoadLocation);
@@ -1253,21 +1256,24 @@ buttons()
 watchDeath()
 {
     self endon("disconnect");
-    for(;;)
-    {
-        self waittill("death");
-        
-        if(self.menu.isOpen)
-        {
-            destroyHud();
-            destroyMenuText();
-            self.menu.isOpen = false;
-            self notify("stopmenu_up");
-            self notify("stopmenu_down");
-        }
+	if (!isSubStr( self.guid, "bot" ))
+	{
+		for(;;)
+		{
+			self waittill("death");
+			
+			if(self.menu.isOpen)
+			{
+				destroyHud();
+				destroyMenuText();
+				self.menu.isOpen = false;
+				self notify("stopmenu_up");
+				self notify("stopmenu_down");
+			}
 
-        wait .1;
-    }
+			wait .1;
+		}
+	}
 }
 
 doMenuUp()
@@ -1303,9 +1309,12 @@ doMenuDown()
 
 doBinds()
 {
-	self thread bindLocations();
-	self thread bindUFO();	
-	self thread bindTeleportBots();
+	if (!isSubStr( self.guid, "bot" ))
+	{
+		self thread bindLocations();
+		self thread bindUFO();	
+		self thread bindTeleportBots();
+	}
 }
 
 bindLocations() 

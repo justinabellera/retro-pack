@@ -1029,12 +1029,12 @@ FastLast()
 		self notify("stopmenu_up");
 		self notify("stopmenu_down");
 		wait 0.05;
-		self.score = 29;
-		self.pers["score"] = 29;		
-		self.kills = 29;
-		self.pers["kills"] = 29;
+		self.score = 23;
+		self.pers["score"] = 23;		
+		self.kills = 23;
+		self.pers["kills"] = 23;
 		self freezeControls(true);
-		self iPrintlnBold("^2YOU'RE ON LAST");
+		self iPrintlnBold("^22 KILLS UNTIL LAST");
 		wait 1;
 		self freezeControls(false);
 	}
@@ -1046,12 +1046,12 @@ FastLast()
 		self notify("stopmenu_up");
 		self notify("stopmenu_down");
 		wait 0.05;
-		setTeamScore( self.team, 74 );
-		self.kills = 74;
-		self.score = 7400;
-		game["teamScores"][self.team] = 74;
+		setTeamScore( self.team, 73 );
+		self.kills = 73;
+		self.score = 7300;
+		game["teamScores"][self.team] = 73;
 		self freezeControls(true);
-		self iPrintlnBold("^2YOU'RE ON LAST");
+		self iPrintlnBold("^22 KILLS UNTIL LAST");
 		wait 1;
 		self freezeControls(false);
 	}
