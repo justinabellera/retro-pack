@@ -11,8 +11,8 @@
  | |                          __/ |     
  |_|                         |___/   
 
-Version: 0.9.1
-Date: August 18, 2024
+Version: 0.9.7
+Date: August 25, 2024
 Compatibility: Modern Warfare Remastered (HM2 Mod)
 */
 #include maps\mp\gametypes\_hud_util;
@@ -35,29 +35,29 @@ getName()
 
 changeTheme( color )
 {
-    self.hud.title.glowColor = color;
-    self.hud.title fadeOverTime(3);
+    self.retropack.title.glowColor = color;
+    self.retropack.title fadeOverTime(3);
 
-    self.hud.leftBar.color = color;
-    self.hud.leftBar fadeOverTime(3);
+    self.retropack.leftBar.color = color;
+    self.retropack.leftBar fadeOverTime(3);
 
-    self.hud.rightBar.color = color;
-    self.hud.rightBar fadeOverTime(3);
+    self.retropack.rightBar.color = color;
+    self.retropack.rightBar fadeOverTime(3);
 
-    self.hud.topBar.color = color;
-    self.hud.topBar fadeOverTime(3);
+    self.retropack.topBar.color = color;
+    self.retropack.topBar fadeOverTime(3);
 
-    self.hud.topSeparator.color = color;
-    self.hud.topSeparator fadeOverTime(3);
+    self.retropack.topSeparator.color = color;
+    self.retropack.topSeparator fadeOverTime(3);
 
-    self.hud.bottomSeparator.color = color;
-    self.hud.bottomSeparator fadeOverTime(3);
+    self.retropack.bottomSeparator.color = color;
+    self.retropack.bottomSeparator fadeOverTime(3);
 
-    self.hud.bottomBar.color = color;
-    self.hud.bottomBar fadeOverTime(3);
+    self.retropack.bottomBar.color = color;
+    self.retropack.bottomBar fadeOverTime(3);
 
-    self.hud.scroller.color = color;
-    self.hud.scroller fadeOverTime(3);
+    self.retropack.scroller.color = color;
+    self.retropack.scroller fadeOverTime(3);
     
     self.theme = color;
 }

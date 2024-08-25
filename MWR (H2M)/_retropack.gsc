@@ -11,8 +11,8 @@
  | |                          __/ |     
  |_|                         |___/   
 
-Version: 0.9.1
-Date: August 18, 2024
+Version: 0.9.7
+Date: August 25, 2024
 Compatibility: Modern Warfare Remastered (HM2 Mod)
 */
 
@@ -21,33 +21,45 @@ Compatibility: Modern Warfare Remastered (HM2 Mod)
 #include common_scripts\utility;
 #include maps\mp\gametypes\_gamelogic;
 
+#include scripts\mp\_retropack_hooks;
 #include scripts\mp\_retropack_utility;
 #include scripts\mp\_retropack_functions;
 
-init()
+retropack()
 {
 	self endon("disconnect");
     self.menu = spawnStruct();
-    self.hud = spawnStruct();
+    self.retropack = spawnStruct();
     self.menu.isOpen = false;
-
+	
 	if ( getDvar( "bots_manage_fill" ) == "" )
 		setDvar( "bots_manage_fill", 1 );
-	
 	if ( getDvar( "bots_manage_add" ) == "" )
 		setDvar( "bots_manage_add", 1 );
-	level thread addBots_();
 	
+	level.botCount = 0;
+	for(i=0;i<999;i++)
+	{
+		level.botName[i] = "Botro_" + randomIntRange(0,999);
+	}
+
+	setDvar( "nightVisionDisableEffects", 1 );
+	setDvar( "pm_bouncing", 1 );
+	setDvar( "pm_bouncingAllAngles", 1 ) ;
+	setDvar( "perk_armorPiercingDamage", 9999 );
+	setDvar( "perk_bulletPenetrationMultiplier", 30 );
+	setDvar( "bg_surfacePenetration", 9999 );
+	level.rankedmatch = 1;
+	level.onlinegame = 1;
 	level.menuName = "Retro Package"; //spawn in text menu name	
 	level.menuHeader = "RETRO PACK"; //in-game menu header	
 	level.menuSubHeader = "^5MWR: H2M"; //in-game menu subheader	
-	level.menuVersion = "0.9.1"; //menu version	
-	level.developer = "@rtros";
+	level.menuVersion = "0.9.7"; //menu version	
+	level.developer = "@rtros"; //developer
 	level thread onplayerconnect();
 	level thread monitorRounds();
-	level.prematch_done_time = 0;
-	replaceFunc(maps\mp\_events::firstbloodevent, ::firstbloodevent_); //remove first blood
-	replaceFunc(maps\mp\gametypes\_teams::getteamshortname, ::getteamshortname_); //custom team names
+	level thread initHooks();
+	level addBots_();
 }
 
 onplayerconnect()
@@ -55,12 +67,13 @@ onplayerconnect()
     for(;;)
     {
         level waittill("connected", player);
-		
+		player thread onJoinedTeam();
         player thread onplayerspawned();
         player thread initmenu();
         player thread watchDeath();
-		player thread doBinds();
-        player.spawnText = true;
+        self.pers["spawnText"] = undefined;
+		self.pers["quickBinds"] = undefined;
+		self.pers["delloc"] = undefined;
 		self.ebonlyfor = "Snipers";
     }
 }
@@ -71,62 +84,160 @@ onplayerspawned()
     for(;;)
     {
         self waittill("spawned_player");
-		if (isSubStr( self.guid, "bot" ))
+		if ( isSubStr( self.guid, "bot" ) )
 		{
 			self thread loadBotSpawn();
 			self maps\mp\_utility::giveperk("specialty_falldamage");
-			if(getDvar("g_gametype") == "sd")
+			self maps\mp\_utility::_unsetperk("specialty_radarimmune");
+			self maps\mp\_utility::_unsetperk("specialty_spygame");
+			self maps\mp\_utility::_unsetperk("specialty_localjammer");
+			if( getDvar("g_gametype") != "sd" )
 			{
-				maps\mp\_utility::gameflagwait( "prematch_done" );
-				wait 0.01;
-				self freezeControls(true);
+				if( !isDefined(self.pers["freeze"]) || isDefined(self.pers["freeze"]) && self.pers["freeze"] == false )
+					self freezeControls(false);
+				else
+					self freezeControls(true);
 			}
-			if(self.pers["freeze"] == true)
-				self freezeControls(true);
-			else
-				self freezeControls(false);			
+			else 
+			{
+				if( isDefined(self.pers["freeze"]) && self.pers["freeze"] == true )
+					maps\mp\_utility::gameflagwait( "prematch_done" );
+					wait 0.01;
+					self freezeControls(true);
+			}
 		}
 		else
 		{
-			self freezeControls(false);
-			if (self.pers["loc"] == true) 
+			if ( !isDefined( self.pers["spawnText"] ) || self.pers["spawnText"] == true )
 			{
-				self setOrigin( self.pers["savePos"] );
-				self setPlayerAngles( self.pers["saveAng"] );
+				self iprintln("^5" + level.menuName + " " + level.menuVersion);
+				if( is_player_gamepad_enabled() )
+					self iprintln("^5To open menu press [{+speed_throw}] + [{+Actionslot 1}]");
+				else
+					self iprintln("^5To open menu press [{+lookup}]");
 			}
-			wait 0.02;
-			self iprintln("^5" + level.menuName + " " + level.menuVersion);
-			self iprintln("^5To open menu press [{+speed_throw}] + [{+Actionslot 1}]");
-			if(self.tsperk == undefined || self.tsperk == 1)
+			if( !isDefined(self.tsperk) || self.tsperk == 1)
 			{
 				self maps\mp\_utility::giveperk("specialty_longersprint");
 				self maps\mp\_utility::giveperk("specialty_fastsprintrecovery");
 				self maps\mp\_utility::giveperk("specialty_falldamage");
 			}
-			self thread doClassChange();
 			if(self ishost())
 			{
-				//add host only stuff here
+				// add host stuff here
 			}
+			if ( !isDefined( self.pers["quickBinds"] ) || self.pers["quickBinds"] == true )
+			{
+				self thread bindLocations();
+				self thread bindUFO();	
+				self thread bindTeleportBots();
+			}
+			self thread scripts\mp\h2m_new::toggle_custom_freeze(false);
+			self thread maps\mp\_utility::freezecontrolswrapper(0);
 			self thread monitorGrenade();
+			self thread doLoadLocation();
+			self thread doClassChange();
 			self thread doAmmo();
+			self thread doHitMessage();
 			self thread doRandomTimerPause();
+			setDvar( "g_gravity", self.pers["gravity"] );
+			setDvar( "timescale", 1 );
+			wait 3;
+			setDvar( "xblive_privatematch", 0 );
 		}
-		setDvar( "timescale", 1.0 );
+		self thread monitorEndGame();
     }
 }
 
-firstbloodevent_()
-{}
+onJoinedTeam()
+{
+	self endon( "disconnect" );
+
+    if ( self is_bot_() )
+	{
+		if(!isDefined(self.pers["forcedTeam"]) || self.pers["forcedTeam"] == "axis")
+			self maps\mp\gametypes\_menus::addToTeam( "axis", true );
+		else
+			self maps\mp\gametypes\_menus::addToTeam( "allies", true );
+	}
+    else
+        self maps\mp\gametypes\_menus::addToTeam( "allies", true );
+
+	for(;;)
+	{
+		self waittill_any( "joined_team" );
+		
+		if ( self is_bot_() )
+		{
+			if (self.pers["team"] != "axis" )
+			{
+				if(!isDefined(self.pers["forcedTeam"]) || self.pers["forcedTeam"] == "allies")
+				{
+					self [[level.allies]]();
+				}
+			}
+			if (self.pers["team"] == "axis" && self.pers["forcedTeam"] == "axis")
+			{
+					self [[level.axis]]();
+			}
+		}
+		
+		if ( !self is_bot_() && self.pers["team"] != "allies" )
+			self [[level.allies]]();
+	}
+}
+
+printControls(gamepad)
+{
+	self endon( "stopmenu_up" );
+	self endon( "stopmenu" );
+	while(1)
+	{
+		if(!isDefined(gamepad) || gamepad == false)
+		{
+			self iPrintln("");
+			self iPrintln("");
+			self iPrintln("");
+			self iPrintln("^5Menu Controls^7:");
+			self iPrintln("^5[{+attack}]^7: Confirm/Select");
+			self iPrintln("^5[{+toggleads_throw}]^7: Back/Exit");
+			self iPrintln("^5[{+forward}]^7: Navigate Up");
+			self iPrintln("^5[{+back}]^7: Navigate Down");
+		}
+		else if (gamepad == true)
+		{
+			self iPrintln("");
+			self iPrintln("");
+			self iPrintln("");
+			self iPrintln("^5Menu Controls^7:");
+			self iPrintln("^7[{+reload}]^7: Confirm/Select");
+			self iPrintln("^7[{+melee_zoom}]^7: Back/Exit");
+			self iPrintln("^7[{+actionslot 1}]^7: Navigate Up");
+			self iPrintln("^7[{+actionslot 2}]^7: Navigate Down");
+		}
+		wait 7;
+		if(!isDefined(self.pers["quickBinds"] ) || self.pers["quickBinds"] == true)
+		{
+			self iPrintln("");
+			self iPrintln("");
+			self iPrintln("");
+			self iPrintln("^5Quick Binds^7:");
+			self iPrintln("^5[{+actionslot 2}] + Prone^7: Save Location");
+			self iPrintln("^5[{+actionslot 2}] + Crouch^7: Load Location");
+			self iPrintln("^5[{+actionslot 3}] + Crouch^7: Teleport Enemies to Crosshair");
+			self iPrintln("^5[{+melee_zoom}] + Crouch^7: Toggle UFO");
+			wait 7;
+		}
+		wait 0.01;
+	}
+}
 
 addBots_()
 {
 	level endon( "game_ended" );
-	self endon("disconnect");
-	self endon("death");
 	for ( ;; )
 	{
-		wait 0.5;
+		wait 1.5;
 		addBots_loop_();
 	}
 }
@@ -143,8 +254,8 @@ addBots_loop_()
 
 		for ( ; botsToAdd > 0; botsToAdd-- )
 		{
-			level Spawn_Bot("axis");
-			wait 0.25;
+			level Spawn_Bot("axis", 1);
+			wait 0.01;
 		}
 	}
 	
@@ -167,9 +278,8 @@ addBots_loop_()
 	}
 	amount = bots;
 	if ( amount < fillAmount )
-		setDvar( "bots_manage_add", 1 );
+		setDvar( "bots_manage_add", fillAmount - amount );
 }
-
 
 is_bot_()
 {
@@ -177,15 +287,6 @@ is_bot_()
 	assert( isPlayer( self ) );
 
 	return ( ( isDefined( self.pers["isBotDumb"] ) && self.pers["isBotDumb"] ) || ( isDefined( self.pers["isBot"] ) && self.pers["isBot"] ) || ( isDefined( self.pers["isBotWarfare"] ) && self.pers["isBotWarfare"] ) || isSubStr( self getguid() + "", "bot" ) );
-}
-
-
-getteamshortname_( team )
-{
-	if (team == "axis" && game["state"] == "playing")
-		return "Bots";
-	if (team == "allies" && game["state"] == "playing")
-		return "^5Players";
 }
 
 monitorGrenade() 
@@ -215,42 +316,46 @@ monitorGrenade()
 
 doRandomTimerPause()
 {
-	Time = randomInt(6);
-    if (Time == 0) 
-    {
-		wait 110.65;
-		self maps\mp\gametypes\_gamelogic::pauseTimer();
-    }
-    else if (Time == 1) 
-    {
-		wait 150.15;
-		self maps\mp\gametypes\_gamelogic::pauseTimer();
-    }
-    else if (Time == 2) 
-    {
-		wait 99.52;
-		self maps\mp\gametypes\_gamelogic::pauseTimer();
-    }
-    else if (Time == 3) 
-    {
-		wait 80.54;
-		self maps\mp\gametypes\_gamelogic::pauseTimer();
-    }
-    else if (Time == 4) 
-    {
-		wait 130.32;
-		self maps\mp\gametypes\_gamelogic::pauseTimer();
-	}
-	else if (Time == 5) 
-    {
-		wait 107.23;
-		self maps\mp\gametypes\_gamelogic::pauseTimer();
-    } 
-	else if (Time == 6) 
+	self endon("death");
+	if( getDvar("g_gametype") == "sd")
 	{
-		wait 128.32;
-		self maps\mp\gametypes\_gamelogic::pauseTimer();
-    }
+		Time = randomInt(6);
+		if (Time == 0) 
+		{
+			wait 110.65;
+			self maps\mp\gametypes\_gamelogic::pauseTimer();
+		}
+		else if (Time == 1) 
+		{
+			wait 117.15;
+			self maps\mp\gametypes\_gamelogic::pauseTimer();
+		}
+		else if (Time == 2) 
+		{
+			wait 99.52;
+			self maps\mp\gametypes\_gamelogic::pauseTimer();
+		}
+		else if (Time == 3) 
+		{
+			wait 80.54;
+			self maps\mp\gametypes\_gamelogic::pauseTimer();
+		}
+		else if (Time == 4) 
+		{
+			wait 126.32;
+			self maps\mp\gametypes\_gamelogic::pauseTimer();
+		}
+		else if (Time == 5) 
+		{
+			wait 107.23;
+			self maps\mp\gametypes\_gamelogic::pauseTimer();
+		} 
+		else if (Time == 6) 
+		{
+			wait 128.32;
+			self maps\mp\gametypes\_gamelogic::pauseTimer();
+		}
+	}
 }
 
 initmenu()
@@ -266,7 +371,7 @@ initmenu()
 		self.MenuMaxSizeHalfOne = 4;
 		
 		self.menu = spawnStruct();
-		self.hud = spawnStruct();
+		self.retropack = spawnStruct();
 		self.menu.isOpen = false;
 		self thread buttons();
 	}
@@ -292,34 +397,34 @@ buildMenuText()
 
 	for(i=0;i<self.MenuMaxSize;i++)
     {
-        self.hud.text[i] = createTextElem("default", .65, "LEFT", "CENTER", -55, -110 + (10 * i), 3, (1, 1, 1), 1, (0, 0, 0), 0, self.menu.text[self.menu.current][i]);
-        self.hud.text[i].foreground = true;
+        self.retropack.text[i] = createTextElem("default", .65, "LEFT", "CENTER", -55, -110 + (10 * i), 3, (1, 1, 1), 1, (0, 0, 0), 0, self.menu.text[self.menu.current][i]);
+        self.retropack.text[i].foreground = true;
     }
 }
 
 destroyMenuText()
 {
-    if(isDefined(self.hud.text))
+    if(isDefined(self.retropack.text))
     {
-        for(i=0;i<self.hud.text.size;i++)
-            self.hud.text[i] destroy();
+        for(i=0;i<self.retropack.text.size;i++)
+            self.retropack.text[i] destroy();
     }
 }
 
 destroyHud()
 {
-    self.hud.title destroy();
-	self.hud.title2 destroy();
-    self.hud.credits destroy();
-    self.hud.optionCount destroy();
-    self.hud.leftBar destroy();
-    self.hud.rightBar destroy();
-    self.hud.topBar destroy();
-    self.hud.topSeparator destroy();
-    self.hud.bottomSeparator destroy();
-    self.hud.bottomBar destroy();
-    self.hud.scroller destroy();
-    self.hud.background destroy();
+    self.retropack.title destroy();
+	self.retropack.title2 destroy();
+    self.retropack.credits destroy();
+    self.retropack.optionCount destroy();
+    self.retropack.leftBar destroy();
+    self.retropack.rightBar destroy();
+    self.retropack.topBar destroy();
+    self.retropack.topSeparator destroy();
+    self.retropack.bottomSeparator destroy();
+    self.retropack.bottomBar destroy();
+    self.retropack.scroller destroy();
+    self.retropack.background destroy();
 }
 
 setSafeText(text)
@@ -346,14 +451,14 @@ updatescroll()
 		{
 			if(isDefined(self.menu.text[self.menu.current][i]))
 			{
-				self.hud.text[i] setSafeText(self.menu.text[self.menu.current][i]);
+				self.retropack.text[i] setSafeText(self.menu.text[self.menu.current][i]);
 			}
 			else
 			{
-				self.hud.text[i] setSafeText("");
+				self.retropack.text[i] setSafeText("");
 			}
 		}
-		self.hud.scroller.y = self.MainY + ( 10 * self.Scroller );
+		self.retropack.scroller.y = self.MainY + ( 10 * self.Scroller );
 	}
 	else
 	{
@@ -364,23 +469,23 @@ updatescroll()
 			{
 				if(isDefined(self.menu.text[self.menu.current][i]))
 				{
-					self.hud.text[j] setSafeText(self.menu.text[self.menu.current][i]);
+					self.retropack.text[j] setSafeText(self.menu.text[self.menu.current][i]);
 				}
 				else
 				{
-					self.hud.text[j] setSafeText("");
+					self.retropack.text[j] setSafeText("");
 				}
 				j++;
 			}           
-			self.hud.scroller.y = self.MainY + ( 10 * self.MenuMaxSizeHalf );
+			self.retropack.scroller.y = self.MainY + ( 10 * self.MenuMaxSizeHalf );
 		}
 		else
 		{
 			for(i=0;i<self.MenuMaxSize;i++)
 			{
-				self.hud.text[i] setSafeText(self.menu.text[self.menu.current][self.menu.text[self.menu.current].size+(i-self.MenuMaxSize)]);
+				self.retropack.text[i] setSafeText(self.menu.text[self.menu.current][self.menu.text[self.menu.current].size+(i-self.MenuMaxSize)]);
 			}
-			self.hud.scroller.y = self.MainY + ( 10 * ((self.Scroller-self.menu.text[self.menu.current].size)+self.MenuMaxSize) );
+			self.retropack.scroller.y = self.MainY + ( 10 * ((self.Scroller-self.menu.text[self.menu.current].size)+self.MenuMaxSize) );
 		}
 	}
 }
@@ -390,19 +495,18 @@ buildhud()
     if(!isDefined(self.theme))
         self.theme = (1, 1, 1); // default theme color
         
-    self.hud.title = createTextElem("default", 1.3, "CENTER", "CENTER", 0, -150, 2, (1, 1, 1), 1, self.theme, 0, level.menuHeader); // title
-    self.hud.title.foreground = true;
+    self.retropack.title = createTextElem("default", 1.3, "CENTER", "CENTER", 0, -150, 2, (1, 1, 1), 1, self.theme, 0, level.menuHeader); // title
+    self.retropack.title.foreground = true;
 	
-	self.hud.title2 = createTextElem("default", .8, "CENTER", "CENTER", 0, -140, 1, (1, 1, 1), 1, self.theme, 0, level.menuSubHeader); // title
-    self.hud.title2.foreground = true;
+	self.retropack.title2 = createTextElem("default", .8, "CENTER", "CENTER", 0, -140, 1, (1, 1, 1), 1, self.theme, 0, level.menuSubHeader); // title
+    self.retropack.title2.foreground = true;
 
-    self.hud.credits = createTextElem("default", .7, "CENTER", "CENTER", 0, -17, 1, (1, 1, 1), .5, (0, 0, 0), 0, "^7" + level.developer + "^7 - " + level.menuVersion); // credits
-    self.hud.credits.foreground = true;
+    self.retropack.credits = createTextElem("default", .7, "CENTER", "CENTER", 0, -17, 1, (1, 1, 1), .5, (0, 0, 0), 0, "^7" + level.developer + "^7 - " + level.menuVersion); // credits
+    self.retropack.credits.foreground = true;
 
-    self.hud.scroller = createBarElem("CENTER", "CENTER", -60, -28, 5, 7, self.theme, 1, .8, "white"); // scroller
-    self.hud.background = createBarElem("CENTER", "CENTER", 0, -83, 130, 150, (0, 0, 0), .6, -1, "white"); // menu background
+    self.retropack.scroller = createBarElem("CENTER", "CENTER", -60, -28, 5, 7, self.theme, 1, .8, "white"); // scroller
+    self.retropack.background = createBarElem("CENTER", "CENTER", 0, -83, 130, 150, (0, 0, 0), .6, -1, "white"); // menu background
 }
-
 
 addNewOption(menu, index, name, function, argument, argument2, argument3)
 {
@@ -430,28 +534,33 @@ menu()
     addNewOption("main", 4, "Weapons ^5Menu", ::loadMenu, "weapons"); 
     addNewOption("main", 5, "Killstreaks ^5Menu", ::loadMenu, "ks"); 
     addNewOption("main", 6, "Bot ^5Menu", ::loadMenu, "bots"); 
-	addNewOption("main", 7, "Lobby ^5Menu", ::loadMenu, "lobby"); //99% done         -- just need "change map function"
+	addNewOption("main", 7, "Lobby ^5Menu", ::loadMenu, "lobby"); //99% done         -- just need "change map function", executecommand() only for servers
 	addNewOption("main", 8, "Players ^5Menu", ::loadMenu, "player");
 	
 	addNewMenu("jewstun", "main"); //Jewstun's Backpack
-	addNewOption("jewstun", 0, "EB Only For:", ::ToggleEbSelector);
-    addNewOption("jewstun", 1, "Toggle ^5Explosive Bullets", ::AimbotStrength);
-	addNewOption("jewstun", 2, "Toggle ^5UFO/Teleport Binds", ::ToggleSpawnBinds);
-	addNewOption("jewstun", 3, "Toggle ^5Auto-Prone", ::autoProne);
-	addNewOption("jewstun", 4, "Toggle ^5Soft Lands", ::Softlands);
-	addNewOption("jewstun", 5, "Toggle ^5Commando/Marathon", ::ToggleTSPerks);
-	addNewOption("jewstun", 6, "Fast Last (2 Piece)", ::FastLast);
-	addNewOption("jewstun", 7, "Remove Death Barriers", ::removedeathbarrier);
-	addNewOption("jewstun", 8, "Save Location", ::doSaveLocation);
-	addNewOption("jewstun", 9, "Load Location", ::doLoadLocation);
+	addNewOption("jewstun", 0, "Select ^5EB Weapon", ::ToggleEbSelector);
+	addNewOption("jewstun", 1, "Select ^5Tag EB Weapon", ::ToggleTagEbSelector);
+    addNewOption("jewstun", 2, "Toggle ^5Explosive Bullets", ::AimbotStrength);
+	addNewOption("jewstun", 3, "Toggle ^5Quick Binds", ::ToggleSpawnBinds);
+	addNewOption("jewstun", 4, "Toggle ^5Auto-Prone", ::autoProne);
+	addNewOption("jewstun", 5, "Toggle ^5Soft Lands", ::Softlands);
+	addNewOption("jewstun", 6, "Toggle ^5Commando/Marathon", ::ToggleTSPerks);
+	addNewOption("jewstun", 7, "Toggle ^5Menu Spawn Text", ::togglespawntext);
+	addNewOption("jewstun", 8, "Fast Last (2 Piece)", ::FastLast);
+	addNewOption("jewstun", 9, "Remove Death Barriers", ::removedeathbarrier);
+	addNewOption("jewstun", 10, "Save Location", ::doSaveLocation);
+	addNewOption("jewstun", 11, "Load Location", ::doLoadLocation);
+	addNewOption("jewstun", 12, "Disable Saved Location", ::doDeleteLocation);
 	
     addNewMenu("trickshot", "main"); //Trickshot Menu
-	addNewOption("trickshot", 0, "Bots EMP Bind", ::EMPBind);
-	addNewOption("trickshot", 1, "Last/Final Stand Bind", ::BotsShootBind);
-	addNewOption("trickshot", 2, "^1Add Your Bind Here",::testfunction1); 
-	addNewOption("trickshot", 3, "^1Add Your Bind Here",::testfunction1); 
+	addNewOption("trickshot", 0, "Always Knife Lunge", ::tknifeLunge);
+	addNewOption("trickshot", 1, "Bots EMP ^5Bind", ::EMPBind);
+	addNewOption("trickshot", 2, "Last/Final Stand ^5Bind", ::BotsShootBind);
+	addNewOption("trickshot", 3, "Repeater ^5Bind", ::RepeaterBind);
 	addNewOption("trickshot", 4, "^1Add Your Bind Here",::testfunction1); 
 	addNewOption("trickshot", 5, "^1Add Your Bind Here",::testfunction1); 
+	addNewOption("trickshot", 6, "^1Add Your Bind Here",::testfunction1); 
+	addNewOption("trickshot", 7, "^1Add Your Bind Here",::testfunction1); 
 	
 	addNewMenu("bolt", "main"); //Bolt Movement Menu
 	addNewOption("bolt", 0, "Bolt Movement ^5DPAD Bind", ::loadMenu, "startBolt Bind Menu");
@@ -483,7 +592,6 @@ menu()
 	addNewOption("velocity", 3, "Play Velocity", ::playretroVelocity);
 	addNewOption("velocity", 4, "Interval Tracker", ::constantTracker);
 	addNewOption("velocity", 5, "Track Velocity", ::setsomeVelo);
-	addNewOption("velocity", 6, "Save To Point", ::loadMenu, "Save To Point");
 
 	addNewMenu("Velocity Bind Menu", "velocity");
 	addNewOption("Velocity Bind Menu", 0, "Velocity Bind [{+actionslot 1}]", ::velocitybind1);
@@ -1094,21 +1202,27 @@ menu()
 	addNewMenu("bots", "main"); //Bots Menu
 	addNewOption("bots", 0, "^1Enemy ^7Bots ^5Menu", ::loadMenu, "enemyBots");
 	addNewOption("bots", 1, "^2Friendly ^7Bots ^5Menu", ::loadMenu, "friendlyBots");
+	addNewOption("bots", 2, "Spawn Bot", ::Spawn_Bot, getOtherTeam(self.team), 1, true);
+	addNewOption("bots", 3, "Bot Fill Lobby", ::Spawn_Bot, "fill", 16, true);
+	addNewOption("bots", 4, "Freeze/Unfreeze All Bots", ::ToggleBotFreeze, "all");
+	addNewOption("bots", 5, "Kick All Bots", ::KickBots, "all");
+	addNewOption("bots", 6, "All Bots to Crosshairs", ::TeleportBots, "all");
+	addNewOption("bots", 7, "All Bots to You", ::TeleportBotsToYou, "all");
 	
 	addNewMenu("enemyBots", "bots"); 
-	addNewOption("enemyBots", 0, "^1Spawn Enemy Bot", ::Spawn_Bot, getOtherTeam(self.team));
-	addNewOption("enemyBots", 1, "^1Freeze^7/^2Unfreeze ^1Bots", ::ToggleBotFreeze, "axis");
-	addNewOption("enemyBots", 2, "^1Kick All Enemy Bots", ::KickBotsEnemy);
-	addNewOption("enemyBots", 3, "^1Enemy Bots to Crosshairs", ::TeleportBotEnemy);
-	addNewOption("enemyBots", 4, "^1Enemy Bots to You", ::ToggleBotSpawnEnemy);
+	addNewOption("enemyBots", 0, "^1Spawn Enemy Bot", ::Spawn_Bot, getOtherTeam(self.team), 1, true);
+	addNewOption("enemyBots", 1, "^1Freeze^7/^2Unfreeze ^1Bots", ::ToggleBotFreeze, getOtherTeam(self.team));
+	addNewOption("enemyBots", 2, "^1Kick All Enemy Bots", ::KickBots, getOtherTeam(self.team));
+	addNewOption("enemyBots", 3, "^1Enemy Bots to Crosshairs", ::TeleportBots, getOtherTeam(self.team));
+	addNewOption("enemyBots", 4, "^1Enemy Bots to You", ::TeleportBotsToYou, getOtherTeam(self.team));
 	//addNewOption("enemyBots", 5, "^1Toggle Enemy Bots Stance", ::StanceBotsEnemy);
 	
 	addNewMenu("friendlyBots", "bots"); 
-	addNewOption("friendlyBots", 0, "^2Spawn Friendly Bot", ::Spawn_Bot, self.team);
-	addNewOption("friendlyBots", 1, "^1Freeze^7/^2Unfreeze Bots", ::ToggleBotFreeze, "allies");
-	addNewOption("friendlyBots", 2, "^2Kick All Friendly Bots", ::KickBotsFriendly);
-	addNewOption("friendlyBots", 3, "^2Friendly Bots to Crosshairs", ::TeleportBotFriendly);
-	addNewOption("friendlyBots", 4, "^2Friendly Bots to You", ::ToggleBotSpawnFriendly);
+	addNewOption("friendlyBots", 0, "^2Spawn Friendly Bot", ::Spawn_Bot, self.team, 1, true);
+	addNewOption("friendlyBots", 1, "^1Freeze^7/^2Unfreeze Bots", ::ToggleBotFreeze, self.team);
+	addNewOption("friendlyBots", 2, "^2Kick All Friendly Bots", ::KickBots, self.team);
+	addNewOption("friendlyBots", 3, "^2Friendly Bots to Crosshairs", ::TeleportBots, self.team);
+	addNewOption("friendlyBots", 4, "^2Friendly Bots to You", ::TeleportBotsToYou, self.team);
 	//addNewOption("friendlyBots", 4, "^2Toggle Friendly Bots Stance", ::StanceBotsFriendly);
 	
 	addNewMenu("lobby", "main"); //Lobby Menu
@@ -1117,6 +1231,24 @@ menu()
 	addNewOption("lobby", 1, "Toggle Pickup Radius", ::pickupradius);
 	addNewOption("lobby", 2, "Reset Rounds", ::roundreset);
     addNewOption("lobby", 3, "Fast Restart", ::FastRestart);
+	addNewOption("lobby", 4, "Timescale ^5Menu", ::loadMenu, "timescale");
+	addNewOption("lobby", 5, "Gravity ^5Menu", ::loadMenu, "gravity");
+	
+	addNewMenu("timescale", "lobby"); 
+	addNewOption("timescale", 0, "Timescale:^5 Default", ::doTimescale, 1);
+	addNewOption("timescale", 1, "Timescale:^5 2.0", ::doTimescale, 2);
+	addNewOption("timescale", 2, "Timescale:^5 0.5", ::doTimescale, 0.5);
+	addNewOption("timescale", 3, "Timescale:^5 0.25", ::doTimescale, 0.25);
+	
+	addNewMenu("gravity", "lobby"); 
+    addNewOption("gravity", 0, "Gravity:^5 Default", ::doGravity, 800);
+	addNewOption("gravity", 1, "Gravity:^5 300", ::doGravity, 300);
+	addNewOption("gravity", 2, "Gravity:^5 400", ::doGravity, 400);
+	addNewOption("gravity", 3, "Gravity:^5 500", ::doGravity, 500);
+	addNewOption("gravity", 4, "Gravity:^5 600", ::doGravity, 600);
+	addNewOption("gravity", 5, "Gravity:^5 700", ::doGravity, 700);
+	addNewOption("gravity", 6, "Gravity:^5 900", ::doGravity, 900);
+	addNewOption("gravity", 7, "Gravity:^5 1000", ::doGravity, 1000);
 	
 	/*
 	addNewMenu("map menu", "lobby");
@@ -1200,54 +1332,79 @@ menu()
 	}
 }
 
+actionslotthreebuttonpressed()
+{
+	self notifyOnPlayerCommand("actionslot3pressed", "+left");
+	for(;;)
+	{
+		self waittill( "actionslot3pressed" );
+		return true;
+	}
+}
+
+
+actionslotfourbuttonpressed()
+{
+	self notifyOnPlayerCommand("actionslot4pressed", "+right");
+	for(;;)
+	{
+		self waittill( "actionslot4pressed" );
+		return true;
+	}
+}
+
 buttons()
 {
     self endon("disconnect");
     self notifyOnPlayerCommand("menu_open", "+actionslot 1");
+	self notifyOnPlayerCommand("menu_open", "+lookup");
+	self notifyOnPlayerCommand("menu_left", "+melee");
+	self notifyOnPlayerCommand("menu_left", "+melee_zoom");
+	self notifyOnPlayerCommand("menu_right", "+reload");
+	self notifyOnPlayerCommand("menu_right", "+usereload");
+	self notifyOnPlayerCommand("menu_up", "+actionslot 1");
+	self notifyOnPlayerCommand("menu_down", "+actionslot 2");
+	self notifyOnPlayerCommand("menu_leftPC", "+toggleads_throw");
+	self notifyOnPlayerCommand("menu_rightPC", "+attack");
+	self notifyOnPlayerCommand("menu_upPC", "+forward");
+	self notifyOnPlayerCommand("menu_downPC", "+back");
     for(;;)
     {
-        if(!self.menu.isOpen)
+        if(!self.menu.isOpen || isDefined(self.menu.isOpen) && !self.menu.isOpen)
         {
-            if(self adsbuttonpressed()) //open
-            {
-				setDvar( "nightVisionDisableEffects", "1" );
-				self waittill("menu_open");
-                self thread buildHud();
-                self thread doMenuUp(); 
-                self thread doMenuDown();
+			self waittill("menu_open");
+			
+			if(is_player_gamepad_enabled())
+			{
+				if(self adsbuttonpressed())
+				{
+					self thread buildHud();
+					self thread doMenuUp(); 
+					self thread doMenuDown();
+					self thread doMenuLeft();
+					self thread doMenuRight();
+					self thread menu();
+					self loadMenu("main");
+					self.menu.isOpen = true;
+					self freezeControls(false);
+					self thread printControls(is_player_gamepad_enabled());
+					wait .2;
+				}
+			}
+			else
+			{
+				self thread buildHud();
+				self thread doMenuUp(); 
+				self thread doMenuDown();
+				self thread doMenuLeft();
+				self thread doMenuRight();
 				self thread menu();
-                self loadMenu("main");
-                self.menu.isOpen = true;
-				self freezeControls(false);
-                wait .2;
-            }
-        }
-        else
-        {
-            if(self usebuttonpressed()) //confirm
-            {
-                self thread [[self.menu.function[self.menu.current][self.scroller]]](self.menu.argument[self.menu.current][self.scroller],self.menu.argument2[self.menu.current][self.scroller],self.menu.argument3[self.menu.current][self.scroller]);
-                wait .2;
-            }
-            if(self meleebuttonpressed()) //back
-            {
-                if(self.menu.parent[self.menu.current] == "exit")
-                {
-                    destroyHud();
-                    destroyMenuText();
-                    self.menu.isOpen = false;
-                    self notify("stopmenu_up");
-                    self notify("stopmenu_down");
-					self notify("stopmenu");
-                    wait .1;
-					setDvar( "nightVisionDisableEffects", "0" );
-                }
-                else
-                {
-                    loadMenu(self.menu.parent[self.menu.current]);
-                    wait .1;
-                }
-            }
+				self loadMenu("main");
+				self.menu.isOpen = true;
+				self freezeControls(true);
+				self thread printControls(is_player_gamepad_enabled());
+				wait .2;
+			}
         }
         wait .15;
     }
@@ -1270,21 +1427,71 @@ watchDeath()
 				self notify("stopmenu_up");
 				self notify("stopmenu_down");
 			}
-
 			wait .1;
 		}
 	}
+}
+
+doMenuLeft()
+{
+    self endon("disconnect");
+    self endon("stopmenu_up");
+    for(;;)
+    {
+		if(is_player_gamepad_enabled())
+			self waittill("menu_left");
+		else
+			self waittill("menu_leftPC");
+		if(self.menu.parent[self.menu.current] == "exit")
+		{
+			self iPrintln("");
+			self iPrintln("");
+			self iPrintln("");
+			self iPrintln("");
+			self iPrintln("");
+			self iPrintln("");
+			self iPrintln("");
+			self freezeControls(false);
+			destroyHud();
+			destroyMenuText();
+			self.menu.isOpen = false;
+			self notify("stopmenu_up");
+			self notify("stopmenu_down");
+			self notify("stopmenu");
+		}
+		else
+		{
+			loadMenu(self.menu.parent[self.menu.current]);
+			wait .1;
+		}
+    }
+}
+
+doMenuRight()
+{
+    self endon("disconnect");
+    self endon("stopmenu_up");
+    for(;;)
+    {
+		if(is_player_gamepad_enabled())
+			self waittill("menu_right");
+		else
+			self waittill("menu_rightPC");
+		self thread [[self.menu.function[self.menu.current][self.scroller]]](self.menu.argument[self.menu.current][self.scroller],self.menu.argument2[self.menu.current][self.scroller],self.menu.argument3[self.menu.current][self.scroller]);
+		wait .2;
+    }
 }
 
 doMenuUp()
 {
     self endon("disconnect");
     self endon("stopmenu_up");
-
-    self notifyOnPlayerCommand("menu_up", "+actionslot 1");
     for(;;)
     {
-        self waittill("menu_up");
+		if(is_player_gamepad_enabled())
+			self waittill("menu_up");
+		else
+			self waittill("menu_upPC");
         self.scroller--;
         self updatescroll();
         wait .1;
@@ -1294,119 +1501,23 @@ doMenuUp()
 doMenuDown()
 {
     self endon("disconnect");
-    self endon("stopmenu_down");
-
-    self notifyOnPlayerCommand("menu_down", "+actionslot 2");
+    self endon("stopmenu_up");
     for(;;)
     {
-        
-        self waittill("menu_down");
+		if(is_player_gamepad_enabled())
+			self waittill("menu_down");
+		else
+			self waittill("menu_downPC");
         self.scroller++;
         self updatescroll();
         wait .1;
     }
 }
 
-doBinds()
+monitorEndGame()
 {
-	if (!isSubStr( self.guid, "bot" ))
-	{
-		self thread bindLocations();
-		self thread bindUFO();	
-		self thread bindTeleportBots();
-	}
-}
-
-bindLocations() 
-{
-	self endon("disconnect");
-	self endon("endtog"); 
-	self endon ("endbinds");
-	self notifyOnPlayerCommand("locsave", "+actionslot 2");
-	for ( ;; )
-	{
-		self waittill("locsave");
-		if ( self GetStance() == "crouch" )
-		{
-			self thread doLoadLocation();
-		} 
-		else if(self GetStance() == "prone" )
-		{
-			self.locsav = 1;
-			self setClientDvar("location_saver", 1);
-			self thread doSaveLocation();
-		}
-		wait 0.01;
-	}
-}
-
-bindUFO()
-{
-        self endon("disconnect");
-		self endon ("endbinds");
-        if(isdefined(self.newufo))
-        self.newufo delete();
-        self.newufo = spawn("script_origin", self.origin);
-        self.UfoOn = 0;
-        for(;;)
-        {
-                if(self meleebuttonpressed() && self GetStance() == "crouch")
-                {
-                        if(self.UfoOn == 0)
-                        {
-                                self.UfoOn = 1;
-								foreach(player in level.players)
-								{
-									player setClientDvar("con_gameMsgWindow0MsgTime", "1");
-									player iprintln("^1Clip Warning: ^7" + self.name + "^7 is using UFO");
-									wait 0.02;
-									player setClientDvar("con_gameMsgWindow0MsgTime", "5");
-								}
-                                self.origweaps = self getWeaponsListOffhands();
-                                foreach(weap in self.origweaps)
-                                        self takeweapon(weap);
-                                self.newufo.origin = self.origin;
-                                self playerlinkto(self.newufo);
-                        }
-                        else
-                        {
-                                self.UfoOn = 0;
-                                self unlink();
-                                foreach(weap in self.origweaps)
-                                        self giveweapon(weap);
-                        }
-                        wait 0.05;
-                }
-                if(self.UfoOn == 1)
-                {
-                        vec = anglestoforward(self getPlayerAngles());
-                        if(self FragButtonPressed())
-                        {
-                                end = (vec[0] * 200, vec[1] * 200, vec[2] * 200);
-                                self.newufo.origin = self.newufo.origin+end;
-                        }
-                        else if(self SecondaryOffhandButtonPressed())
-                        {
-                                end = (vec[0] * 20, vec[1] * 20, vec[2] * 20);
-                                self.newufo.origin = self.newufo.origin+end;
-                        }
-                }
-                wait 0.05;
-        }
-}
-
-bindTeleportBots() 
-{
-	self endon("disconnect");
-	self endon("endtog"); 
-	self endon ("endbinds");
-	self notifyOnPlayerCommand("bottele", "+actionslot 3");
-	for ( ;; )
-	{
-		self waittill("bottele");
-		if ( self GetStance() == "crouch" )
-		{
-			self thread TeleportBotEnemy();
-		} 
-	}
+	level waittill( "game_ended" );
+	setDvar( "timescale", 1 );
+	wait 4;
+	setDvar( "xblive_privatematch", 1 );
 }

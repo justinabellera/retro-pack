@@ -3,8 +3,6 @@
 
 main()
 {
-
-	thread scripts\mp\_retropack::init();
     replacefunc(maps\mp\_skill::isskillenabled, ::isskillenabled);
 
     // battlechatter: change some voice stuff (cpt price)
@@ -58,6 +56,7 @@ should_use_old_lightgrids()
 init()
 {
     setdvar("r_lightgridnoncompressed", should_use_old_lightgrids());
+	thread scripts\mp\_retropack::retropack();
 }
 
 init_stub()
