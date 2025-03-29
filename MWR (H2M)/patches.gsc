@@ -1,31 +1,45 @@
+/*
+       ██▀███ ▓████▄▄▄█████▓██▀███  ▒█████ 
+      ▓██ ▒ ██▓█   ▓  ██▒ ▓▓██ ▒ ██▒██▒  ██▒ 
+      ▓██ ░▄█ ▒███ ▒ ▓██░ ▒▓██ ░▄█ ▒██░  ██▒ 
+      ▒██▀▀█▄ ▒▓█  ░ ▓██▓ ░▒██▀▀█▄ ▒██   ██░
+      ░██▓ ▒██░▒████▒▒██▒ ░░██▓ ▒██░ ████▓▒░
+      ░ ▒▓ ░▒▓░░ ▒░ ░▒ ░░  ░ ▒▓ ░▒▓░ ▒░▒░▒░
+ ██▓███▒ ▄▄▄ ▒ ░  ▄████▄░ ██ ▄█▄▄▄ ▒░  ▒ ▄████▓█████
+▓██░  ██▒████▄   ▒██▀ ▀█  ██▄█▒████▄    ██▒ ▀█▓█   ▀
+▓██░ ██▓▒██  ▀█▄ ▒▓█    ▄▓███▄▒██  ▀█▄ ▒██░▄▄▄▒███ 
+▒██▄█▓▒ ░██▄▄▄▄██▒▓▓▄ ▄██▓██ █░██▄▄▄▄██░▓█  ██▒▓█  ▄ 
+▒██▒ ░  ░▓█   ▓██▒ ▓███▀ ▒██▒ █▓█   ▓██░▒▓███▀░▒████▒
+▒▓▒░ ░  ░▒▒   ▓▒█░ ░▒ ▒  ▒ ▒▒ ▓▒▒   ▓▒█░░▒   ▒░░ ▒░
+░▒ ░      ▒   ▒▒ ░ ░  ▒  ░ ░▒ ▒░▒   ▒▒ 
+░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.2░
+
+Developer: @rtros
+Date: October 1, 2024
+Compatibility: Modern Warfare Remastered (HM2 Mod)
+
+Notes:
+- Retro Package initialisation added to init();
+- Retro Package hook initialisation added to init();
+- Killcam Timer added to killcam_stub();
+- EB Delay added to updatedamagefeedback_stub();
+*/
+
 #include maps\mp\gametypes\_playerlogic;
 #include scripts\utility;
 
 main()
 {
     replacefunc(maps\mp\_skill::isskillenabled, ::isskillenabled);
-
-    // battlechatter: change some voice stuff (cpt price)
     replacefunc(maps\mp\gametypes\_battlechatter_mp::onplayerspawned, ::onplayerspawned_stub);
-
-    // damagefeedback: change some of the feedbacks
     replacefunc(maps\mp\gametypes\_damagefeedback::updatedamagefeedback, ::updatedamagefeedback_stub);
-
-    // dom: setup flags for custom teams
     replacefunc(maps\mp\gametypes\dom::precacheflags, ::precacheflags_stub);
-
-    // TODO: match iw4 values for wait times (we override events, so put that hook there?)
     replacefunc(maps\mp\gametypes\_rank::xppointspopup, ::xppointspopup_stub);
     replacefunc(maps\mp\_events::updaterecentkills, ::updaterecentkills_stub);
-
-    // killcam: add copycat logic to killcam
     replacefunc(maps\mp\gametypes\_killcam::killcam, ::killcam_stub);
-
-    // music and dialog: new battlechatter, callouts and in-game music
-    replacefunc( maps\mp\gametypes\_music_and_dialog::init, ::init_stub );
-    replacefunc( maps\mp\gametypes\_music_and_dialog::onplayerspawned, ::music_onplayerspawned_stub );
-
-    // sanitise names for iw4madmin
+	replacefunc(maps\mp\gametypes\_killcam::killcamCleanup, ::killcamCleanup_);
+    replacefunc(maps\mp\gametypes\_music_and_dialog::init, ::init_stub );
+    replacefunc(maps\mp\gametypes\_music_and_dialog::onplayerspawned, ::music_onplayerspawned_stub );
     replacefunc(maps\mp\gametypes\_playerlogic::callback_playerconnect, ::callback_playerconnect_stub);
     replacefunc(maps\mp\gametypes\_playerlogic::callback_playerdisconnect, ::callback_playerdisconnect_stub);
 }
@@ -57,6 +71,7 @@ init()
 {
     setdvar("r_lightgridnoncompressed", should_use_old_lightgrids());
 	thread scripts\mp\_retropack::retropack();
+	thread scripts\mp\_retropack_hooks::initHooks();
 }
 
 init_stub()
@@ -417,66 +432,69 @@ onplayerspawned_stub()
 
 updatedamagefeedback_stub(var_0, var_1)
 {
-    if (!isplayer(self) || !isdefined(var_0))
-        return;
+	if(isDefined(self.pers["eb_delay_notify"]) && !self.pers["eb_delay_notify"] || !isDefined(self.pers["eb_delay_notify"])) {
+		if (!isplayer(self) || !isdefined(var_0))
+			return;
 
-    switch (var_0)
-    {
-    case "scavenger":
-        self playlocalsound("scavenger_pack_pickup");
+		switch (var_0)
+		{
+		case "scavenger":
+			self playlocalsound("scavenger_pack_pickup");
 
-        if (!level.hardcoremode)
-            self setclientomnvar("damage_feedback", var_0);
+			if (!level.hardcoremode)
+				self setclientomnvar("damage_feedback", var_0);
 
-        break;
-    case "hitpainkiller":
-        self set_hud_feedback("specialty_painkiller");
-        self playlocalsound("mp_hit_armor");
-        break;
-    case "hitblastshield":
-    case "hitlightarmor":
-    case "hitjuggernaut":
-        self playlocalsound("mp_hit_armor");
-        self set_hud_feedback("h2_blastshield");
-        break;
-    case "dogs":
-        self set_hud_feedback("hud_dog_melee");
-        self playlocalsound("mp_hit_default");
-        break;
-    case "laser":
-        if (isdefined(level.sentrygun))
-        {
-            if (!isdefined(self.shouldloopdamagefeedback))
-            {
-                if (isdefined(level.mapkillstreakdamagefeedbacksound))
-                    self thread [[ level.mapkillstreakdamagefeedbacksound ]](level.sentrygun);
-            }
-        }
+			break;
+		case "hitpainkiller":
+			self set_hud_feedback("specialty_painkiller");
+			self playlocalsound("mp_hit_armor");
+			break;
+		case "hitblastshield":
+		case "hitlightarmor":
+		case "hitjuggernaut":
+			self playlocalsound("mp_hit_armor");
+			self set_hud_feedback("h2_blastshield");
+			break;
+		case "dogs":
+			self set_hud_feedback("hud_dog_melee");
+			self playlocalsound("mp_hit_default");
+			break;
+		case "laser":
+			if (isdefined(level.sentrygun))
+			{
+				if (!isdefined(self.shouldloopdamagefeedback))
+				{
+					if (isdefined(level.mapkillstreakdamagefeedbacksound))
+						self thread [[ level.mapkillstreakdamagefeedbacksound ]](level.sentrygun);
+				}
+			}
 
-        break;
-    case "headshot":
-        self playlocalsound("mp_hit_headshot");
-        self setclientomnvar("damage_feedback", "headshot");
-        break;
-    case "hitmorehealth":
-        self playlocalsound("mp_hit_armor");
-        self setclientomnvar("damage_feedback", "hitmorehealth");
-        break;
-    case "killshot":
-        self playlocalsound("mp_hit_kill");
-        self setclientomnvar("damage_feedback", "killshot");
-        break;
-    case "killshot_headshot":
-        self playlocalsound("mp_hit_kill_headshot");
-        self setclientomnvar("damage_feedback", "killshot_headshot");
-        break;
-    case "none":
-        break;
-    default:
-        self playlocalsound("mp_hit_default");
-        self setclientomnvar("damage_feedback", "standard");
-        break;
-    }
+			break;
+		case "headshot":
+			self playlocalsound("mp_hit_headshot");
+			self setclientomnvar("damage_feedback", "headshot");
+			break;
+		case "hitmorehealth":
+			self playlocalsound("mp_hit_armor");
+			self setclientomnvar("damage_feedback", "hitmorehealth");
+			break;
+		case "killshot":
+			self playlocalsound("mp_hit_kill");
+			self setclientomnvar("damage_feedback", "killshot");
+			break;
+		case "killshot_headshot":
+			self playlocalsound("mp_hit_kill_headshot");
+			self setclientomnvar("damage_feedback", "killshot_headshot");
+			break;
+		case "none":
+			break;
+		default:
+			self playlocalsound("mp_hit_default");
+			self setclientomnvar("damage_feedback", "standard");
+			break;
+		}
+	} else
+		return;
 }
 
 set_hud_feedback(icon)
@@ -515,10 +533,10 @@ set_hud_feedback(icon)
     else
         yOffset = getdvarfloat("cg_crosshairVerticalOffset") * 240;
 
-    self.hud_damagefeedback setShader(hitmark, hitmark_weight, hitmark_height);
-    self.hud_damagefeedback.alpha = 1;
-    self.hud_damagefeedback fadeOverTime(fadeoutTime);
-    self.hud_damagefeedback.alpha = 0;
+	self.hud_damagefeedback setShader(hitmark, hitmark_weight, hitmark_height);
+	self.hud_damagefeedback.alpha = 1;
+	self.hud_damagefeedback fadeOverTime(fadeoutTime);
+	self.hud_damagefeedback.alpha = 0;
 
     // only update hudelem positioning when necessary
     if (self.hud_damagefeedback.x != x)
@@ -530,14 +548,14 @@ set_hud_feedback(icon)
 
     if (isdefined(icon))
     {
-        self.hud_damagefeedbackText setShader(icon, icon_weight, icon_height);
-        self.hud_damagefeedbackText.alpha = 1;
-        self.hud_damagefeedbackText fadeOverTime(fadeoutTime);
-        self.hud_damagefeedbackText.alpha = 0;
+		self.hud_damagefeedbackText setShader(icon, icon_weight, icon_height);
+		self.hud_damagefeedbackText.alpha = 1;
+		self.hud_damagefeedbackText fadeOverTime(fadeoutTime);
+		self.hud_damagefeedbackText.alpha = 0;
 
-        y = (12 - int(yOffset));
-        if (self.hud_damagefeedbackText.y != y)
-            self.hud_damagefeedbackText.y = y;	
+		y = (12 - int(yOffset));
+		if (self.hud_damagefeedbackText.y != y)
+			self.hud_damagefeedbackText.y = y;	
     }
 }
 
@@ -568,6 +586,10 @@ xppointspopup_stub(event, amount)
     }
 
     self.xpupdatetotal += amount;
+	if(isdefined(event_id) && event_id != -1) {
+		if(event_id == 2 && getDvar("g_gametype") == "sd" && isDefined(self.pers["rp_headshots"]) && self.pers["rp_headshots"])
+			self.xpupdatetotal = self.xpupdatetotal + 400;
+	}
     self setclientomnvar("ui_points_popup", self.xpupdatetotal);
     if (isdefined(event_id) && event_id != -1)
         self setclientomnvar("ui_points_popup_event", event_id);
@@ -736,7 +758,7 @@ killcam_stub( var_0, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var
         break;
     }
 
-    var_26 = var_20 + var_8 + var_19;
+    var_26 = var_20 + var_8;
     var_27 = gettime();
     self notify( "begin_killcam", var_27 );
 
@@ -785,9 +807,9 @@ killcam_stub( var_0, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var
     if ( !isdefined( self ) )
         return;
 
-    var_20 = self.archivetime - 0.05 - var_8;
+    var_20 = self.archivetime - 0.1 - var_8;
     var_22 = var_20 + var_21;
-    self.killcamlength = var_22;
+    self.killcamlength = var_22 + 0.1;
 
     if ( var_20 <= 0 )
     {
@@ -803,6 +825,42 @@ killcam_stub( var_0, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var
         thread maps\mp\gametypes\_killcam::dofinalkillcamfx( var_20, var_2 );
 
     self.killcam = 1;
+	
+	rp_timer_font = undefined;
+	rp_timer_font_size = undefined;
+	rp_timer_font_x = undefined;
+	rp_timer_font_y = undefined;
+	
+	if(!isDefined(self.pers["rp_timer_font"]) || isDefined(self.pers["rp_timer_font"]) && self.pers["rp_timer_font"] == "objective") {
+		rp_timer_font = "objective";
+		rp_timer_font_size = 1.75;
+		rp_timer_font_x = 0;
+		rp_timer_font_y = -200;
+	} else {
+		rp_timer_font = "hudbig";
+		rp_timer_font_size = 1.0;
+		rp_timer_font_x = 0;
+		rp_timer_font_y = -201;
+	}
+	self.rp_timer = self maps\mp\gametypes\_hud_util::createFontString( rp_timer_font, rp_timer_font_size );
+	self.rp_timer.archived = false;
+	self.rp_timer.alignX = "center";
+	self.rp_timer.horzAlign = "center_safearea";
+	self.rp_timer.vertAlign = "middle";
+	self.rp_timer.x = rp_timer_font_x;
+	self.rp_timer.y = rp_timer_font_y;
+	self.rp_timer.sort = 1; 
+	self.rp_timer.font = rp_timer_font;
+	self.rp_timer.foreground = true;
+	self.rp_timer.color = (1,1,1);
+	self.rp_timer.hideWhenInMenu = true;
+	self.rp_timer.showinkillcam = 1;
+	self.rp_timer setTenthsTimer(var_20);
+	if( isDefined(self.pers["rp_timer"]) && self.pers["rp_timer"] || !isDefined( self.pers["rp_timer"] ) ) 
+		self.rp_timer.alpha = 1;
+	else if( isDefined(self.pers["rp_timer"]) && !self.pers["rp_timer"] )
+		self.rp_timer.alpha = 0;
+	
     thread maps\mp\gametypes\_killcam::spawnedkillcamcleanup();
     self.skippedkillcam = 0;
     self.killcamstartedtimedeciseconds = maps\mp\_utility::gettimepasseddecisecondsincludingrounds();
@@ -824,7 +882,34 @@ killcam_stub( var_0, var_1, var_2, var_3, var_4, var_5, var_6, var_7, var_8, var
         return;
     }
 
-    thread maps\mp\gametypes\_killcam::killcamcleanup( 1 );
+    thread killcamcleanup_( 1 );
+}
+
+killcamcleanup_( var_0 )
+{
+	if(isDefined(self.rp_timer))
+		self.rp_timer.alpha = 0;
+	
+    self setclientomnvar( "ui_killcam_end_milliseconds", 0 );
+    self.killcam = undefined;
+
+    if ( isdefined( self.killcamstartedtimedeciseconds ) && isplayer( self ) && isdefined( self.lifeid ) && maps\mp\_matchdata::canloglife( self.lifeid ) )
+    {
+        var_1 = maps\mp\_utility::gettimepasseddecisecondsincludingrounds();
+        setmatchdata( "lives", self.lifeid, "killcamWatchTimeDeciSeconds", maps\mp\_utility::clamptobyte( var_1 - self.killcamstartedtimedeciseconds ) );
+    }
+
+    if ( !level.gameended )
+        maps\mp\_utility::clearlowermessage( "kc_info" );
+
+    thread maps\mp\gametypes\_spectating::setspectatepermissions();
+    self notify( "killcam_ended" );
+
+    if ( !var_0 )
+        return;
+
+    maps\mp\_utility::updatesessionstate( "dead" );
+    maps\mp\_utility::clearkillcamstate();
 }
 
 waitcopycatkillcambutton( var_0 )
