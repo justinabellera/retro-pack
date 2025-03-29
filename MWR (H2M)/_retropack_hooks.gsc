@@ -665,7 +665,7 @@ revivetriggerthink_(var_0) {
 
       if (isDefined(self.owner.pers["freeze"]) && !self.owner.pers["freeze"])
         self.owner common_scripts\utility::_enableweapon();
-      self.owner.maxhealth = 100;
+      self.owner.maxhealth = self.owner.pers["max_health"];
       self.owner maps\mp\gametypes\_weapons::updatemovespeedscale("primary");
       self.owner laststandrespawnplayer_();
       self.owner.beingrevived = 0;
@@ -759,7 +759,7 @@ laststandrespawnplayer_() {
   if (isdefined(self.standardmaxhealth))
     self.maxhealth = self.standardmaxhealth;
 
-  self.health = self.maxhealth;
+  self.health = self.pers["max_health"];
 
   common_scripts\utility::_enableusability();
 
@@ -802,6 +802,8 @@ laststandtimer_(var_0, var_1) {
     var_3.color = (0.33, 0.75, 0.24);
     maps\mp\_utility::playdeathsound();
     thread maps\mp\gametypes\_damage::laststandkeepoverlay();
+	maps\mp\_utility::setlowermessage("last_stand_self_revive", "[{+usereload}] Self Revive", undefined, undefined, undefined, undefined, undefined, undefined, 1);
+	thread laststandallow_selfrevive();
   } else {
     if (level.diehardmode == 1 && level.diehardmode != 2) {
       var_2 = spawn("script_model", self.origin);
@@ -876,4 +878,48 @@ laststandtimer_(var_0, var_1) {
     wait(var_0);
     thread maps\mp\gametypes\_damage::laststandbleedout(var_1);
   }
+}
+
+laststandallow_selfrevive() {
+    self endon("death");
+    self endon("disconnect");
+    self endon("game_ended");
+    self endon("revive");
+
+    for (;;) {
+      if (self usebuttonpressed() && isDefined(self.inlaststand) && self.inlaststand) {
+        var_0 = gettime();
+
+        while (self usebuttonpressed()) {
+          wait 0.05;
+
+          if (gettime() - var_0 > 5500)
+            break;
+        }
+
+        if (gettime() - var_0 > 5500)
+          break;
+      }
+
+      wait 0.05;
+    }
+    maps\mp\_utility::freezecontrolswrapper(0);
+    common_scripts\utility::_enableweapon();
+
+    self.laststand = undefined;
+    self.inlaststand = 0;
+    self.beingrevived = 0;
+	self.health = self.pers["max_health"];
+    self.maxhealth = self.pers["max_health"];
+    self.movespeedscaler = level.baseplayermovescale;
+
+    if (self maps\mp\_utility::_hasperk("specialty_lightweight"))
+      self.movespeedscaler = maps\mp\_utility::lightweightscalar();
+
+    self maps\mp\gametypes\_weapons::updatemovespeedscale();
+
+    maps\mp\_utility::clearlowermessage("last_stand_self_revive");
+    self thread maps\mp\gametypes\_hud_message::playercardsplashnotify("survivor", self);
+
+    self laststandrespawnplayer_();
 }
