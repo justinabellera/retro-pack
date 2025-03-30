@@ -26,7 +26,7 @@ Notes:
 
 initHooks() {
   if (getDvar("g_gametype") != "sd")
-    replaceFunc(maps\mp\perks\_perkfunctions::monitorTIUse, ::monitorTIUse_);
+    replaceFunc(maps\mp\perks\_perkfunctions::monitorTIUse, ::monitorTIUse_);;
   replaceFunc(maps\mp\perks\_perkfunctions::giveonemanarmyclass, ::giveonemanarmyclass_);
   replaceFunc(maps\mp\_events::firstbloodevent, ::firstbloodevent_);
   replaceFunc(maps\mp\gametypes\_gamelogic::checkroundswitch, ::returnNull_);
@@ -930,7 +930,10 @@ giveonemanarmyclass_( var_0 )
     self endon( "death" );
     self endon( "disconnect" );
     level endon( "game_ended" );
-
+	self.oma_previous = undefined;
+	if ( self getcurrentweapon() == "onemanarmy_mp" )
+		self.oma_previous = 1;
+	
     if ( maps\mp\_utility::_hasperk( "specialty_omaquickchange" ) ) {
         duration = 3.0;
         self playlocalsound( "foly_onemanarmy_bag3_plr" );
@@ -971,12 +974,19 @@ giveonemanarmyclass_( var_0 )
         maps\mp\gametypes\_class::applyloadout();
         maps\mp\gametypes\_hardpoints::giveownedhardpointitem( true );
     }
-	
+
+	if ( isdefined( self.oma_previous ) && self.oma_previous ) {
+	  self takeweapon( self.primaryweapon );
+	  wait 0.01;
+	  self giveweapon( self.primaryweapon );
+	}
+  
 	if ( isdefined( self.pers["oma_running"] ) && self.pers["oma_running"] ) {
-	  self setSpawnWeapon(self.primaryweapon);
-	  self force_play_weap_anim(33, 33);
+	  self setSpawnWeapon( self.primaryweapon );
+	  self force_play_weap_anim( 33, 33 );
 	} else if ( isdefined( self.pers["oma_shax"] ) && self.pers["oma_shax"] ) {
-	  self scripts\mp\_retropack_binds::do_can((self.primaryweapon), true);
+	  self setSpawnWeapon( self.primaryweapon );
+	  self force_play_weap_anim( 19, 19 );
 	}
     self setweaponammoclip( weaponaltweaponname( self.primaryweapon ), 0 );
     self setweaponammostock( weaponaltweaponname( self.primaryweapon ), 0 );
@@ -986,4 +996,5 @@ giveonemanarmyclass_( var_0 )
 
     self notify( "changed_kit" );
     level notify( "changed_kit" );
+	self.oma_previous = undefined;
 }
