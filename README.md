@@ -23,7 +23,7 @@ Call of Duty Mod Menu for various titles based on _GSC_.
 </br>+ **MW3 Mod Version (PlutoIW5)**: 1.0.2b (_Updated July 7, 2024_)
 </br>+ **BO1 Mod Version (Steam/Rekt/PlutoT5)**: 0.9.0 (_Updated June 5, 2022_)
 </br>+ **BO2 Mod Version (PlutoT6)**: _Planned_
-</br>+ **MWR:H2M Mod Version (H2M-Mod)**: 1.0.2 (_Updated March 29, 2024_)
+</br>+ **MWR:H2M Mod Version (H2M-Mod)**: 1.0.2a (_Updated March 30, 2024_)
 </br>+ **Ghosts Mod Version (IW6x)**: _WIP (Unreleased)_
 </br>+ **COD4 Mod Version (CoD4X)**: _Planned_
 </br>+ **WAW Mod Version (PlutoT4)**: _Planned_
