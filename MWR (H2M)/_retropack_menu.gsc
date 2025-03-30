@@ -295,6 +295,7 @@ menu_index() {
     self add_toggle("Save Location", ::do_save_location, self.pers["saved_location"], undefined, self, false);
     self add_option("Load Location", ::do_load_location, self, true);
     self add_option("Drop Can Swap", ::give_can_swap);
+	self add_option("Suicide", ::do_kill, self);
     if (getDvar("g_gametype") == "dm" || getDvar("g_gametype") == "war") {
       self add_option("Fast Last", ::do_fast_last, self);
       self add_option("Reset Kills", ::do_reset_scores, 0, self);
@@ -332,6 +333,8 @@ menu_index() {
     self add_toggle("Always Knife Lunge", ::toggle_knife_lunge, self.pers["knife_lunge"]);
     self add_toggle("Always R-Mala", ::toggle_rmala, self.pers["rmala"]);
     self add_toggle("Always Insta Tac Plant", ::toggle_instaplant, self.pers["instaplant"]);
+	self add_toggle("Always OMA Shax", ::toggle_shax, self.pers["oma_shax"]);
+	self add_toggle("Always OMA Running Man", ::toggle_running_man, self.pers["oma_running"]);
     self add_toggle("Always Wildscope", ::toggle_wildscope, self.pers["wildscope"]);
     self add_toggle("Always Wildscope (Lunge)", ::toggle_wildscopelunge, self.pers["wildscope_lunge"]);
     self add_divider();
@@ -770,7 +773,7 @@ menu_index() {
       self add_option("None", ::select_perk_rp, "None", undefined, retropack_storage(1, "Perks"));
 
     if (self.previous[self.previous.size - 1] != "Class") {
-      self add_toggle("Perks Carry-Over", ::toggle_flag_perk, self.pers["flag_perk"]);
+      self add_toggle("Perks Stick", ::toggle_flag_perk, self.pers["flag_perk"]);
       self add_category("Perks");
     }
     for (i = 1; i < 33; i++) {

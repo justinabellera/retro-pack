@@ -647,10 +647,8 @@ set_melee_damage(damage) {
 }
 
 set_sniper_damage(damage) {
-  self iPrintln("Sniper Damage: ^5" + damage);
-  if (damage == 100)
-    damage = 9999;
   setDvar("rp_sniper_damage", damage);
+  self iPrintln("Sniper Damage: ^5" + damage);
 }
 
 set_bot_damage(damage) {
@@ -1259,7 +1257,7 @@ detach_camo(weapon) {
 */
 
 really_alive() {
-  return isalive(self) && !return_toggle(self.laststand);
+  return isalive(self) && !return_toggle(self.inlaststand);
 }
 
 has_menu() {
@@ -1480,7 +1478,7 @@ string_retropack() {
     text = "PRESS [{+lookup}] FOR THE RETRO PACKAGE";
 
   if (!isDefined(self.retropack["retropack"]["controls"])) {
-    self.retropack["retropack"]["controls"] = self create_text(text, "objective", 0.55, "RIGHT", "CENTER", 415, -230, (1, 1, 1), 1, 1);
+    self.retropack["retropack"]["controls"] = self create_text(text, "objective", 0.55, "LEFT", "CENTER", -415, 230, (1, 1, 1), 1, 1);
   }
 }
 

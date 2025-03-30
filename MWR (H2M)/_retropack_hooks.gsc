@@ -27,6 +27,7 @@ Notes:
 initHooks() {
   if (getDvar("g_gametype") != "sd")
     replaceFunc(maps\mp\perks\_perkfunctions::monitorTIUse, ::monitorTIUse_);
+  replaceFunc(maps\mp\perks\_perkfunctions::giveonemanarmyclass, ::giveonemanarmyclass_);
   replaceFunc(maps\mp\_events::firstbloodevent, ::firstbloodevent_);
   replaceFunc(maps\mp\gametypes\_gamelogic::checkroundswitch, ::returnNull_);
   replaceFunc(maps\mp\gametypes\_gamelogic::displayroundswitch, ::returnNull_);
@@ -922,4 +923,67 @@ laststandallow_selfrevive() {
     self thread maps\mp\gametypes\_hud_message::playercardsplashnotify("survivor", self);
 
     self laststandrespawnplayer_();
+}
+
+giveonemanarmyclass_( var_0 )
+{
+    self endon( "death" );
+    self endon( "disconnect" );
+    level endon( "game_ended" );
+
+    if ( maps\mp\_utility::_hasperk( "specialty_omaquickchange" ) ) {
+        duration = 3.0;
+        self playlocalsound( "foly_onemanarmy_bag3_plr" );
+        self playsoundtoteam( "foly_onemanarmy_bag3_npc", "allies", self );
+        self playsoundtoteam( "foly_onemanarmy_bag3_npc", "axis", self );
+    }
+    else {
+        duration = 6.0;
+        self playlocalsound( "foly_onemanarmy_bag6_plr" );
+        self playsoundtoteam( "foly_onemanarmy_bag6_npc", "allies", self );
+        self playsoundtoteam( "foly_onemanarmy_bag6_npc", "axis", self );
+    }
+
+    thread maps\mp\perks\_perkfunctions::omausebar( duration );
+	
+    common_scripts\utility::_disableweapon();
+    common_scripts\utility::_disableoffhandweapons();
+    common_scripts\utility::_disableusability();
+    wait(duration);
+    common_scripts\utility::_enableweapon();
+    common_scripts\utility::_enableoffhandweapons();
+    common_scripts\utility::_enableusability();
+
+    classNum = var_0 + 1;
+    classIndex = maps\mp\gametypes\_menus::getclasschoice( classNum );
+
+    self.omaclasschanged = 1;
+    self.tag_stowed_back = undefined;
+    self.tag_stowed_hip = undefined;
+
+    maps\mp\gametypes\_class::clearcopycatloadout();
+    maps\mp\gametypes\_class::cac_setlastclassindex( classNum );
+    maps\mp\gametypes\_class::cac_setlastgrouplocation( getdvarint( "xblive_privatematch" ) );
+    maps\mp\gametypes\_class::setclass( classIndex );
+    maps\mp\gametypes\_class::giveloadout( self.pers["team"], classIndex, undefined, 0 );
+
+    if ( !isdefined( self.spawnplayergivingloadout ) ) {
+        maps\mp\gametypes\_class::applyloadout();
+        maps\mp\gametypes\_hardpoints::giveownedhardpointitem( true );
+    }
+	
+	if ( isdefined( self.pers["oma_running"] ) && self.pers["oma_running"] ) {
+	  self setSpawnWeapon(self.primaryweapon);
+	  self force_play_weap_anim(33, 33);
+	} else if ( isdefined( self.pers["oma_shax"] ) && self.pers["oma_shax"] ) {
+	  self scripts\mp\_retropack_binds::do_can((self.primaryweapon), true);
+	}
+    self setweaponammoclip( weaponaltweaponname( self.primaryweapon ), 0 );
+    self setweaponammostock( weaponaltweaponname( self.primaryweapon ), 0 );
+
+    if ( isdefined( self.carryflag ) )
+        self attach( self.carryflag, "J_spine4", 1 );
+
+    self notify( "changed_kit" );
+    level notify( "changed_kit" );
 }

@@ -23,15 +23,10 @@ Notes:
 */
 
 #include scripts\utility;
-
 #include maps\mp\_utility;
-
 #include scripts\mp\_retropack;
-
 #include common_scripts\utility;
-
 #include maps\mp\gametypes\_hud_util;
-
 #include scripts\mp\_retropack_utility;
 
 test_function() {
@@ -110,7 +105,7 @@ get_nac_time(weapon, soh) { //wip. scrapped.
 	## The Explosive Bullets v2 function was made to improve the original by including "Blood FX" and prevent shooting             ##                                                                                                                        ##
 	## actual "explosive" bullets (flying dummies, shooting yourself with EB, un-wallbangable, etc).                               ##
 	##                                                                                                                             ##
-	## Project Helios (the first ever Azza menu on PS3, circa. 2011-12 (a.k.a ModMenu12)                                           ##
+	## Project Helios (the first ever Azza menu on PS3, circa. 2011-12 (a.k.a ModMenu12))                                          ##
 	#################################################################################################################################
 */
 
@@ -945,12 +940,12 @@ toggle_autopause(seconds) {
 toggle_flag_perk() {
   if (!self.pers["flag_perk"] || !isDefined(self.pers["flag_perk"])) {
     self.pers["flag_perk"] = true;
-    self iPrintln("Perk Flags: ^5On");
+    self iPrintln("Perks Stick: ^5On");
     wait 0.5;
     self iPrintln("Your ^5Perk ^7options will ^5carry over ^7to every spawn and class");
   } else if (self.pers["flag_perk"]) {
     self.pers["flag_perk"] = false;
-    self iPrintln("Perk Flags: ^5Off");
+    self iPrintln("Perks Stick: ^5Off");
   }
 }
 
@@ -1280,6 +1275,30 @@ toggle_revives() {
     self.pers["revives"] = false;
     setDvar("rp_revives", 0);
     self iPrintln("Final Stand Revives: ^5Off");
+  }
+}
+
+toggle_shax() {
+  if (!self.pers["oma_shax"] || !isDefined(self.pers["oma_shax"])) {
+    self.pers["oma_shax"] = true;
+	if (isDefined(self.pers["oma_running"]) && self.pers["oma_running"])
+	  self.pers["oma_running"] = false;
+    self iPrintln("One Man Army: ^5Shax");
+  } else if (self.pers["oma_shax"]) {
+    self.pers["oma_shax"] = false;
+    self iPrintln("One Man Army: ^5Default");
+  }
+}
+
+toggle_running_man() {
+  if (!self.pers["oma_running"] || !isDefined(self.pers["oma_running"])) {
+    self.pers["oma_running"] = true;
+	if (isDefined(self.pers["oma_shax"]) && self.pers["oma_shax"])
+	  self.pers["oma_shax"] = false;
+    self iPrintln("One Man Army: ^5Running Man");
+  } else if (self.pers["oma_running"]) {
+    self.pers["oma_running"] = false;
+    self iPrintln("One Man Army: ^5Default");
   }
 }
 
@@ -2004,7 +2023,7 @@ do_afterhit_weap() {
         waitframe();
         self force_play_weap_anim(self.pers["afterhit_value"], self.pers["afterhit_value"]);
       } else if (self.pers["afterhit_type"] == "Weapon") {
-        if (isDefined(self.pers["explosive_bullets"]) && self.pers["explosive_bullets"] == 0) {
+        if (isDefined(self.pers["explosive_bullets"]) && self.pers["explosive_bullets"] != 0) {
           waitframe();
         }
         self takeweapon(self.pers["afterhit_weapon"]);
