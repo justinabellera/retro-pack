@@ -12,11 +12,11 @@
 ▒██▒ ░  ░▓█   ▓██▒ ▓███▀ ▒██▒ █▓█   ▓██░▒▓███▀░▒████▒
 ▒▓▒░ ░  ░▒▒   ▓▒█░ ░▒ ▒  ▒ ▒▒ ▓▒▒   ▓▒█░░▒   ▒░░ ▒░
 ░▒ ░      ▒   ▒▒ ░ ░  ▒  ░ ░▒ ▒░▒   ▒▒ 
-░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.2░
+░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.3
 
 Developer: @rtros
-Date: October 1, 2024
-Compatibility: Modern Warfare Remastered (HM2 Mod)
+Date: April 1, 2025
+Compatibility: Modern Warfare Remastered (H2M/HMW Mod)
 
 Notes:
 - N/A
@@ -33,15 +33,30 @@ retropack() {
   self endon("disconnect");
 
   /* Precaches */
-  foreach(index, shader in ["hud_icon_mp9", "hud_icon_cheytac", "hud_icon_hatchet", "hud_icon_ice_pick", "hud_icon_sickle", "hud_icon_shovel", "hud_icon_karambit", "hud_icon_famas", "hud_icon_ak74u", "hud_icon_wa2000", "hud_icon_kriss", "hud_icon_mini_uzi", "hud_icon_usp_45", "hud_icon_ump45", "hud_icon_tavor", "hud_icon_striker", "hud_icon_stinger", "hud_icon_steyr", "hud_icon_spas12", "hud_icon_scar_h", "hud_icon_sa80_lmg", "hud_icon_rpg", "hud_icon_rpd", "hud_icon_riot_shield", "hud_icon_sawed_off", "hud_icon_pp2000", "hud_icon_p90", "hud_icon_mp9", "hud_icon_mp5k", "hud_icon_model1887", "hud_icon_mg4", "hud_icon_m79", "hud_icon_m4_grunt", "hud_icon_m40a3", "hud_icon_m240", "hud_icon_m16a4", "hud_icon_benelli_m4", "hud_icon_javelin", "hud_icon_glock", "hud_icon_fn2000", "hud_icon_fnfal", "hud_icon_m14ebr_scope", "hud_icon_desert_eagle", "hud_icon_colt_anaconda", "hud_icon_colt_45", "hud_icon_cheytac", "hud_icon_m9beretta", "hud_icon_beretta393", "hud_icon_barrett50cal", "hud_icon_at4", "hud_icon_ak47", "hud_icon_m4carbine", "hud_icon_aa12", "h2m_cheytac_ui", "em_st_180", "rank_comm", "h2m_rank_prestige1", "h2m_rank_prestige1", "h2m_rank_prestige3", "h2m_rank_prestige4", "h2m_rank_prestige5", "h2m_rank_prestige6", "h2m_rank_prestige7", "h2m_rank_prestige8", "h2m_rank_prestige9", "h2m_rank_prestige10", "ui_arrow_right", "specialty_finalstand", "specialty_pistoldeath", "weapon_attachment_suppressor", "weapon_attachment_reflex", "weapon_attachment_fastfire", "weapon_attachment_tacknife", "weapon_attachment_holographic", "weapon_attachment_shotty", "weapon_attachment_thermal2", "weapon_attachment_xmag", "weapon_attachment_shotgun", "weapon_attachment_grip", "weapon_attachment_acog", "specialty_null", "weapon_attachment_akimbo", "weapon_attachment_fmj", "h2_reflex", "specialty_copycat"])
+  foreach(index, shader in ["h2m_weapon_claymore", "weapon_semtex", "weapon_fraggrenade", "weapon_throwingknife", "dpad_tacticalinsert", "h2m_weapon_c4", "weapon_blastshield", "hud_icon_mp9", "hud_icon_cheytac", "hud_icon_hatchet", "hud_icon_ice_pick", "hud_icon_sickle", "hud_icon_shovel", "hud_icon_karambit", "hud_icon_famas", "hud_icon_ak74u", "hud_icon_wa2000", "hud_icon_kriss", "hud_icon_mini_uzi", "hud_icon_usp_45", "hud_icon_ump45", "hud_icon_tavor", "hud_icon_striker", "hud_icon_stinger", "hud_icon_steyr", "hud_icon_spas12", "hud_icon_scar_h", "hud_icon_sa80_lmg", "hud_icon_rpg", "hud_icon_rpd", "hud_icon_riot_shield", "hud_icon_sawed_off", "hud_icon_pp2000", "hud_icon_p90", "hud_icon_mp9", "hud_icon_mp5k", "hud_icon_model1887", "hud_icon_mg4", "hud_icon_m79", "hud_icon_m4_grunt", "hud_icon_m40a3", "hud_icon_m240", "hud_icon_m16a4", "hud_icon_benelli_m4", "hud_icon_javelin", "hud_icon_glock", "hud_icon_fn2000", "hud_icon_fnfal", "hud_icon_m14ebr_scope", "hud_icon_desert_eagle", "hud_icon_colt_anaconda", "hud_icon_colt_45", "hud_icon_cheytac", "hud_icon_m9beretta", "hud_icon_beretta393", "hud_icon_barrett50cal", "hud_icon_at4", "hud_icon_ak47", "hud_icon_m4carbine", "hud_icon_aa12", "h2m_cheytac_ui", "em_st_180", "rank_comm", "h2m_rank_prestige1", "h2m_rank_prestige1", "h2m_rank_prestige3", "h2m_rank_prestige4", "h2m_rank_prestige5", "h2m_rank_prestige6", "h2m_rank_prestige7", "h2m_rank_prestige8", "h2m_rank_prestige9", "h2m_rank_prestige10", "ui_arrow_right", "weapon_attachment_suppressor", "weapon_attachment_reflex", "weapon_attachment_fastfire", "weapon_attachment_tacknife", "weapon_attachment_holographic", "weapon_attachment_shotty", "weapon_attachment_thermal2", "weapon_attachment_xmag", "weapon_attachment_shotgun", "weapon_attachment_grip", "weapon_attachment_acog", "specialty_null", "weapon_attachment_akimbo", "weapon_attachment_fmj", "h2_reflex"])
   precacheshader(shader);
 
   foreach(index, gloves in ["viewhands_infect", "viewhands_h2_ghillie", "globalViewhands_mw2_militia", "viewhands_udt", "viewhands_rangers", "globalViewhands_mw2_airborne", "viewhands_h1_arab_desert_mp_camo", "viewhands_tf141"])
   precachemodel(gloves);
+  
+  for (i = 0; i < 44; i++) {
+    perk = tableLookup("mp/perktable.csv", 0, i, 2);
+    precachestring(&"" + perk);
+  }
+  
+  precachestring(&"LUA_MENU_SNIPER_RIFLES_CAPS");
+  precachestring(&"LUA_MENU_ASSAULT_RIFLES_CAPS");
+  precachestring(&"LUA_MENU_SMGS_CAPS");
+  precachestring(&"LUA_MENU_LMGS_CAPS");
+  precachestring(&"LUA_MENU_MACHINE_PISTOLS_CAPS");
+  precachestring(&"LUA_MENU_SHOTGUNS_CAPS");
+  precachestring(&"LUA_MENU_HANDGUNS_CAPS");
+  precachestring(&"LUA_MENU_LAUNCHERS_CAPS");
+  precachestring(&"LUA_MENU_MELEE1_CAPS");
 
   for (i = 1; i < tablegetrowcount("mp/camotable.csv"); i++) {
-    shaderCamo = tableLookup("mp/camotable.csv", 0, i, 4);
-    precacheshader(shaderCamo);
+    camo = tableLookup("mp/camotable.csv", 0, i, 4);
+    precacheshader(camo);
   }
 
   /* Dvars */
@@ -67,9 +82,10 @@ retropack() {
   level.menuName = "Retro Package";
   level.menuHeader = "RETRO_PACKAGE";
   level.menuSubHeader = "H2M";
-  level.menuVersion = "1.0.2";
+  level.menuVersion = "1.0.3";
   level.developer = "@rtros";
 
+  level thread retropack_binds();
   level thread retropack_bots();
   level thread on_player_connect();
   level thread monitor_round();
@@ -241,27 +257,38 @@ apply_flags(player) {
       name = maps\mp\perks\_perks::perktablelookuplocalizedname(perk);
       if (!isSubStr(perk, "specialty_"))
         continue;
+	
+      if(getDvar("g_gametype") == "sd" && getDvarInt("rp_revives") == 1 && perk == "specialty_finalstand" && player maps\mp\_utility::_hasPerk("specialty_finalstand"))
+        continue;
 
       if (isDefined(player.pers["flag_perk"]) && player.pers["flag_perk"]) {
         player.pers["flag_perk"] = true;
         if (player maps\mp\_utility::_hasPerk(perk) && !isDefined(player.pers["set_" + perk]) || player maps\mp\_utility::_hasPerk(perk) && isDefined(player.pers["set_" + perk]) && player.pers["set_" + perk]) {
           player.pers["set_" + perk] = true;
+		  player.pers["set_" + get_perk_upgrade(perk)] = true;
         } else if (!player maps\mp\_utility::_hasPerk(perk) && !isDefined(player.pers["set_" + perk]) || !player maps\mp\_utility::_hasPerk(perk) && isDefined(player.pers["set_" + perk]) && !player.pers["set_" + perk]) {
           player.pers["set_" + perk] = false;
+		  player.pers["set_" + get_perk_upgrade(perk)] = false;
         } else if (player maps\mp\_utility::_hasPerk(perk) && isDefined(player.pers["set_" + perk]) && !player.pers["set_" + perk]) {
           player.pers["set_" + perk] = false;
+		  player.pers["set_" + get_perk_upgrade(perk)] = false;
           player maps\mp\_utility::_unsetperk(perk);
+		  player maps\mp\_utility::_unsetperk(get_perk_upgrade(perk));
         } else if (!player maps\mp\_utility::_hasPerk(perk) && isDefined(player.pers["set_" + perk]) && player.pers["set_" + perk]) {
           player.pers["set_" + perk] = true;
+          player.pers["set_" + get_perk_upgrade(perk)] = true;
           player maps\mp\_utility::giveperk(perk);
+          player maps\mp\_utility::giveperk(get_perk_upgrade(perk));
           maps\mp\perks\_perks::applyperks();
         }
       } else if (!isDefined(player.pers["flag_perk"]) || isDefined(player.pers["flag_perk"]) && !player.pers["flag_perk"]) {
         player.pers["flag_perk"] = false;
         if (player maps\mp\_utility::_hasPerk(perk)) {
           player.pers["set_" + perk] = true;
+          player.pers["set_" + get_perk_upgrade(perk)] = true;
         } else if (!player maps\mp\_utility::_hasPerk(perk)) {
           player.pers["set_" + perk] = false;
+          player.pers["set_" + get_perk_upgrade(perk)] = false;
         }
       }
     }

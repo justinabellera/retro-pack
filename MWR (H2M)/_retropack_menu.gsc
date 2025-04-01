@@ -12,11 +12,11 @@
 ▒██▒ ░  ░▓█   ▓██▒ ▓███▀ ▒██▒ █▓█   ▓██░▒▓███▀░▒████▒
 ▒▓▒░ ░  ░▒▒   ▓▒█░ ░▒ ▒  ▒ ▒▒ ▓▒▒   ▓▒█░░▒   ▒░░ ▒░
 ░▒ ░      ▒   ▒▒ ░ ░  ▒  ░ ░▒ ▒░▒   ▒▒ 
-░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.2░
+░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.3
 
 Developer: @rtros
-Date: October 1, 2024
-Compatibility: Modern Warfare Remastered (HM2 Mod)
+Date: April 1, 2025
+Compatibility: Modern Warfare Remastered (H2M/HMW Mod)
 
 Notes:
 - N/A
@@ -277,10 +277,8 @@ menu_index() {
     self add_option("Weapon Menu", ::new_menu, "Weapons");
     self add_option("Bind Menu", ::new_menu, "Binds");
     self add_option("Killstreak Menu", ::new_menu, "Killstreak");
-    self add_option("Raise Menu", ::new_menu, "Raise");
     self add_option("Animation Menu", ::new_menu, "Animation");
     self add_option("Afterhit Menu", ::new_menu, "Afterhit");
-    self add_option("Bot Menu", ::new_menu, "Bots");
     self add_option("Player Menu", ::new_menu, "User");
     break;
   case "Trickshot":
@@ -301,6 +299,7 @@ menu_index() {
       self add_option("Reset Kills", ::do_reset_scores, 0, self);
       self add_toggle("Give TK after Tac Insert", ::toggle_tk_insert, self.pers["tk_tact"]);
     }
+	self add_string("Spawn Bot", false, ::spawn_bot, [getOtherTeam(self.team), self.team]);
     self add_toggle("Quick Binds", ::toggle_quick_binds, self.pers["quick_binds"]);
     self add_toggle("Auto-Prone", ::do_auto_prone, self.pers["auto_prone"]);
     self add_toggle("Auto-Replenish Ammo", ::toggle_replenish_ammo, self.pers["auto_replenish"]);
@@ -321,76 +320,86 @@ menu_index() {
     self add_toggle("Laptop Nac (Fast)", ::set_afterhit, self.pers["afterhit_option_laptop_nac_fast"], undefined, "Fast Pred", "predator_mp", "Laptop Nac (Fast)", "laptop_nac_fast");
     self add_toggle("Laptop Nac Lunge", ::set_afterhit, self.pers["afterhit_option_laptop_nac_lunge"], undefined, "Pred Knife", "predator_mp", "Laptop Nac Lunge", "laptop_nac_lunge");
     break;
-  case "Raise":
-    self add_menu(menu);
-    self add_toggle("Always Raise", ::toggle_raise_status, self.pers["do_raise"]);
-    self add_string("Always Raise Type", true, ::set_raise_type, ["None", "Fast Glide", "G-Flip", "Can Swap", "Can Zoom", "Instashoot"]);
-    self add_toggle("Always Raise Weapon", ::toggle_raise_weapon, self.pers["select_raise"]);
-    break;
   case "Animation":
     self add_menu(menu);
-    //self add_toggle("Always Reload Nac (WIP)", ::toggle_reloadnac, self.pers["reload_nac"]); // todo
-    self add_toggle("Always Knife Lunge", ::toggle_knife_lunge, self.pers["knife_lunge"]);
+    self add_toggle("Raise Animation", ::toggle_raise_status, self.pers["do_raise"]);
+    self add_string("Raise Type", true, ::set_raise_type, ["None", "Fast Glide", "G-Flip", "Can Swap", "Can Zoom", "Sprint", "Invisible", "Instashoot"]);
+    self add_toggle("Raise Weapon", ::toggle_raise_weapon, self.pers["select_raise"]);
+	self add_divider();
+	self add_toggle("Always Knife Lunge", ::toggle_knife_lunge, self.pers["knife_lunge"]);
     self add_toggle("Always R-Mala", ::toggle_rmala, self.pers["rmala"]);
     self add_toggle("Always Insta Tac Plant", ::toggle_instaplant, self.pers["instaplant"]);
 	self add_toggle("Always OMA Shax", ::toggle_shax, self.pers["oma_shax"]);
 	self add_toggle("Always OMA Running Man", ::toggle_running_man, self.pers["oma_running"]);
     self add_toggle("Always Wildscope", ::toggle_wildscope, self.pers["wildscope"]);
     self add_toggle("Always Wildscope (Lunge)", ::toggle_wildscopelunge, self.pers["wildscope_lunge"]);
-    self add_divider();
-	self add_bind("Can Swap Bind", ::bind_canswap, "canswap");
-    self add_bind("Can Zoom Bind", ::bind_canzoom, "zoom");
-    self add_bind("Care Package Nac Bind", ::bind_fakenac, "cpnac", "airdrop_marker_mp");
-    self add_bind("Laptop Nac Bind", ::bind_fakenac, "prednac", "predator_mp");
-    self add_bind("Smooth Bind", ::bind_animation, "smooth", 1);
-    self add_bind("Mantle Bind", ::bind_animation, "mantle", 50);
-    self add_bind("Sprint Bind", ::bind_animation, "running", 33);
-    self add_bind("Knife Lunge Bind", ::bind_lunge, "knifeanim");
-    self add_bind("Inspect Bind", ::bind_animation, "inspect", 58);
-    self add_bind("Cock Back Bind", ::bind_animation, "cockback", 7);
-    self add_bind("Empty Mag Bind", ::bind_animation, "emptymag", 21);
-    self add_bind("Reload Bind", ::bind_animation, "reload", 20);
-    self add_bind("Invisible Gun Bind", ::bind_animation, "invisible", 17);
-    self add_bind("Fast Glide Bind", ::bind_fastglide, "fastglide");
     break;
   case "Binds":
     self add_menu(menu);
-    self add_option("Damage Buffer", ::new_menu, "Damage Buffer");
-	self add_option("Bolt Movement", ::new_menu, "Bolt");
-    self add_option("Velocity", ::new_menu, "Velocity");
-    self add_bind("Nac Mod Bind", ::bind_nacmod, "nacmod");
-    self add_bind("Instaswap Bind", ::bind_instaswap, "instaswap");
-	self add_bind("Empty Mag Bind", ::bind_emptymag_real, "emptymag_real");
-	self add_bind("Last Bullet Bind", ::bind_lastbullet, "lastbullet");
-    self add_bind("G-Flip Bind", ::bind_gflip, "gflip");
-    self add_bind("Alt Swap Bind", ::bind_altswap, "altswap");
-    self add_bind("Bot EMP Bind", ::bind_emp, "doemp");
-    self add_bind("Change Class Bind", ::bind_classchange, "classchange");
-    self add_bind("Damage Bind", ::bind_damage, "damage");
-    self add_bind("Scavenger Bind", ::bind_scavenger, "scavenger");
-    self add_bind("Hitmarker Bind", ::bind_hitmarker, "hitmarker");
-    self add_bind("Flash Bind", ::bind_flash, "flash");
-    self add_bind("Third Eye Bind", ::bind_thirdeye, "thirdeye");
-    self add_bind("Semtext Stuck Bind", ::bind_stuck, "stuck");
-    self add_bind("Last Stand Bind", ::bind_laststand, "laststand");
-    self add_bind("Final Stand Bind", ::bind_finalstand, "finalstand");
-    self add_bind("Destroy Tac Bind", ::bind_destroytac, "destroytac");
-    self add_bind("OMA Shax Bind", ::bind_omashax, "omashax");
-    self add_bind("Vish Bind", ::bind_vish, "vish");
-    self add_bind("Copycat Bind", ::bind_copycat, "copycat");
-    self add_bind("Painkiller Bind", ::bind_painkiller, "painkiller");
-    self add_bind("Blast Shield Bind", ::bind_blastshield, "blastshield");
-    self add_bind("Repeater Bind", ::bind_repeater, "repeater");
-    break;
-  case "Damage Buffer":
+	if(isDefined(self.pers["bind_damagebuffer"]) && self.pers["bind_damagebuffer"])
+	  self add_option("Damage Buffer Targets", ::new_menu, "User");
+	if(isDefined(self.pers["bind_bolt"]) && self.pers["bind_bolt"])
+	  self add_option("Bolt Movement Settings", ::new_menu, "Bolt");
+	if(isDefined(self.pers["bind_velocity"]) && self.pers["bind_velocity"])
+      self add_option("Velocity Settings", ::new_menu, "Velocity");
+	if(isDefined(self.pers["bind_velocity"]) && self.pers["bind_velocity"]
+	|| isDefined(self.pers["bind_bolt"]) && self.pers["bind_bolt"]
+	|| isDefined(self.pers["bind_damagebuffer"]) && self.pers["bind_damagebuffer"])
+	  self add_divider();
+	self add_label("   [{+actionslot 1}]", self.pers["bind_+actionslot 1_text"], ::new_menu, "Binds 2", "[{+actionslot 1}]");
+	self add_label("   [{+actionslot 2}]", self.pers["bind_+actionslot 2_text"], ::new_menu, "Binds 2", "[{+actionslot 2}]");
+	self add_label("   [{+actionslot 3}]", self.pers["bind_+actionslot 3_text"], ::new_menu, "Binds 2", "[{+actionslot 3}]");
+	self add_label("   [{+actionslot 4}]", self.pers["bind_+actionslot 4_text"], ::new_menu, "Binds 2", "[{+actionslot 4}]");
+	self add_label("   [{+smoke}]", self.pers["bind_+smoke_text"], ::new_menu, "Binds 2", "[{+smoke}]");
+	self add_label("   [{+frag}]", self.pers["bind_+frag_text"], ::new_menu, "Binds 2", "[{+frag}]");
+	self add_label("   [{+attack}]", self.pers["bind_+attack_text"], ::new_menu, "Binds 2", "[{+attack}]");
+	self add_label("   [{+speed_throw}]", self.pers["bind_+speed_throw_text"], ::new_menu, "Binds 2", "[{+speed_throw}]");
+	break;
+  case "Binds 2":
     self add_menu(menu);
-    self add_bind("Damage Buffer Bind", ::bind_damagebuffer, "damagebuffer");
-    self add_option("Damage Buffer Targets", ::new_menu, "User");
+	self add_option("Off", ::set_bind, retropack_storage(1, "Binds 2"), undefined, undefined, "Off", undefined);
+	self add_option("Alt Swap", ::set_bind, retropack_storage(1, "Binds 2"), "altswap", ::bind_altswap, "Alt Swap", undefined);
+	self add_option("Blast Shield", ::set_bind, retropack_storage(1, "Binds 2"), "blastshield", ::bind_blastshield, "Blast Shield", undefined);
+	self add_option("Bolt", ::set_bind, retropack_storage(1, "Binds 2"), "bolt", ::bind_bolt, "Bolt", undefined);
+	self add_option("Bot EMP", ::set_bind, retropack_storage(1, "Binds 2"), "doemp", ::bind_emp, "Bot EMP", undefined);
+	self add_option("Can Swap", ::set_bind, retropack_storage(1, "Binds 2"), "canswap", ::bind_canswap, "Can Swap", undefined);
+	self add_option("Can Zoom", ::set_bind, retropack_storage(1, "Binds 2"), "zoom", ::bind_canzoom, "Can Zoom", undefined);
+	self add_option("Care Package Nac", ::set_bind, retropack_storage(1, "Binds 2"), "cpnac", ::bind_fakenac, "Care Package Nac", "airdrop_marker_mp");
+	self add_option("Change Class", ::set_bind, retropack_storage(1, "Binds 2"), "classchange", ::bind_classchange, "Change Class", undefined);
+	self add_option("Cock Back", ::set_bind, retropack_storage(1, "Binds 2"), "cockback", ::bind_animation, "Cock Back", 7);
+	self add_option("Copycat", ::set_bind, retropack_storage(1, "Binds 2"), "copycat", ::bind_copycat, "Copycat", undefined);
+	self add_option("Damage Buffer", ::set_bind, retropack_storage(1, "Binds 2"), "damagebuffer", ::bind_damagebuffer, "Damage Buffer", undefined);
+	self add_option("Damage", ::set_bind, retropack_storage(1, "Binds 2"), "damage", ::bind_damage, "Damage", undefined);
+	self add_option("Destroy Tac", ::set_bind, retropack_storage(1, "Binds 2"), "destroytac", ::bind_destroytac, "Destroy Tac", undefined);
+	self add_option("Empty Mag", ::set_bind, retropack_storage(1, "Binds 2"), "emptymag", ::bind_emptymag_real, "Empty Mag", undefined);
+	self add_option("Fast Glide", ::set_bind, retropack_storage(1, "Binds 2"), "fastglide", ::bind_fastglide, "Fast Glide", undefined);
+	self add_option("Final Stand", ::set_bind, retropack_storage(1, "Binds 2"), "finalstand", ::bind_finalstand, "Final Stand", undefined);
+	self add_option("Flash", ::set_bind, retropack_storage(1, "Binds 2"), "flash", ::bind_flash, "Flash", undefined);
+	self add_option("G-Flip", ::set_bind, retropack_storage(1, "Binds 2"), "gflip", ::bind_gflip, "G-Flip", undefined);
+	self add_option("Hitmarker", ::set_bind, retropack_storage(1, "Binds 2"), "hitmarker", ::bind_hitmarker, "Hitmarker", undefined);
+	self add_option("Inspect", ::set_bind, retropack_storage(1, "Binds 2"), "inspect", ::bind_animation, "Inspect", 58);
+	self add_option("Instaswap", ::set_bind, retropack_storage(1, "Binds 2"), "instaswap", ::bind_instaswap, "Instaswap", undefined);
+	self add_option("Invisible Gun", ::set_bind, retropack_storage(1, "Binds 2"), "invisible", ::bind_animation, "Invisible Gun", 17);
+	self add_option("Knife Lunge", ::set_bind, retropack_storage(1, "Binds 2"), "knifeanim", ::bind_lunge, "Knife Lunge", undefined);
+	self add_option("Laptop Nac", ::set_bind, retropack_storage(1, "Binds 2"), "prednac", ::bind_fakenac, "Laptop Nac", "predator_mp");
+	self add_option("Last Bullet", ::set_bind, retropack_storage(1, "Binds 2"), "lastbullet", ::bind_lastbullet, "Last Bullet", undefined);
+	self add_option("Last Stand", ::set_bind, retropack_storage(1, "Binds 2"), "laststand", ::bind_laststand, "Last Stand", undefined);
+	self add_option("Mantle", ::set_bind, retropack_storage(1, "Binds 2"), "mantle", ::bind_animation, "Mantle", 50);
+	self add_option("Nac Mod", ::set_bind, retropack_storage(1, "Binds 2"), "nacmod", ::bind_nacmod, "Nac Mod", undefined);
+	self add_option("OMA Shax", ::set_bind, retropack_storage(1, "Binds 2"), "omashax", ::bind_omashax, "OMA Shax", undefined);
+	self add_option("Painkiller", ::set_bind, retropack_storage(1, "Binds 2"), "painkiller", ::bind_painkiller, "Painkiller", undefined);
+	self add_option("Reload", ::set_bind, retropack_storage(1, "Binds 2"), "reload", ::bind_animation, "Reload", 20);
+	self add_option("Repeater", ::set_bind, retropack_storage(1, "Binds 2"), "repeater", ::bind_repeater, "Repeater", undefined);
+	self add_option("Scavenger", ::set_bind, retropack_storage(1, "Binds 2"), "scavenger", ::bind_scavenger, "Scavenger", undefined);
+	self add_option("Semtext Stuck", ::set_bind, retropack_storage(1, "Binds 2"), "stuck", ::bind_stuck, "Semtext Stuck", undefined);
+	self add_option("Smooth", ::set_bind, retropack_storage(1, "Binds 2"), "smooth", ::bind_animation, "Smooth", 1);
+	self add_option("Sprint", ::set_bind, retropack_storage(1, "Binds 2"), "running", ::bind_animation, "Sprint", 33);
+	self add_option("Third Eye", ::set_bind, retropack_storage(1, "Binds 2"), "thirdeye", ::bind_thirdeye, "Third Eye", undefined);
+	self add_option("Velocity", ::set_bind, retropack_storage(1, "Binds 2"), "velocity", ::bind_velocity, "Velocity", undefined);
+	self add_option("Vish", ::set_bind, retropack_storage(1, "Binds 2"), "vish", ::bind_vish, "Vish", undefined);
     break;
   case "Bolt":
     self add_menu(menu);
-    self add_bind("Bolt Bind", ::bind_bolt, "bolt");
-    self add_category("Bolt Editor");
     self add_option("Record Bolt Path", ::bolt_record);
     self add_option("Save Point", ::bolt_save);
     self add_option("Delete Point", ::bolt_delete);
@@ -400,11 +409,9 @@ menu_index() {
     break;
   case "Velocity":
     self add_menu(menu);
-    self add_bind("Velocity Bind", ::bind_velocity, "velocity");
-    self add_category("Velocity Editor");
-    self add_increment("Velocity X", true, ::velocity_axis, 0, -1500, 1500, 25, "X");
-    self add_increment("Velocity Y", true, ::velocity_axis, 0, -1500, 1500, 25, "Y");
-    self add_increment("Velocity Z", true, ::velocity_axis, 0, -1500, 1500, 25, "Z");
+    self add_increment("Velocity X", true, ::velocity_axis, 0, -1500, 1500, 50, "X");
+    self add_increment("Velocity Y", true, ::velocity_axis, 0, -1500, 1500, 50, "Y");
+    self add_increment("Velocity Z", true, ::velocity_axis, 0, -1500, 1500, 50, "Z");
     self add_option("Track Velocity", ::velocity_track);
     self add_option("Preview Velocity", ::velocity_start);
     self add_option("Reset Velocity", ::velocity_reset);
@@ -423,18 +430,18 @@ menu_index() {
       self add_category("Give Weapon");
     }
     if (self.previous[self.previous.size - 1] == "Class") {
-      self add_option("None", ::select_weapon_rp, "None");
+	  self add_option(&"PERKS_NONE", ::select_weapon_rp, "None", retropack_storage(1, "Weapons"));
       self add_category(retropack_storage(1, "Weapons"));
     }
-    self add_option("Snipers", ::new_menu, "Snipers", retropack_storage(1, "Weapons"));
-    self add_option("Shotguns", ::new_menu, "Shotguns", retropack_storage(1, "Weapons"));
-    self add_option("Pistols", ::new_menu, "Pistols", retropack_storage(1, "Weapons"));
-    self add_option("Machine Pistols", ::new_menu, "Machine Pistols", retropack_storage(1, "Weapons"));
-    self add_option("Assault Rifles", ::new_menu, "Assault Rifles", retropack_storage(1, "Weapons"));
-    self add_option("Submachine Guns", ::new_menu, "Submachine Guns", retropack_storage(1, "Weapons"));
-    self add_option("Light Machine Guns", ::new_menu, "Light Machine Guns", retropack_storage(1, "Weapons"));
-    self add_option("Launchers", ::new_menu, "Launchers", retropack_storage(1, "Weapons"));
-    self add_option("Melee", ::new_menu, "Melee", retropack_storage(1, "Weapons"));
+    self add_option(&"LUA_MENU_SNIPER_RIFLES_CAPS", ::new_menu, "Snipers", retropack_storage(1, "Weapons"));
+    self add_option(&"LUA_MENU_SHOTGUNS_CAPS", ::new_menu, "Shotguns", retropack_storage(1, "Weapons"));
+    self add_option(&"LUA_MENU_HANDGUNS_CAPS", ::new_menu, "Pistols", retropack_storage(1, "Weapons"));
+    self add_option(&"LUA_MENU_MACHINE_PISTOLS_CAPS", ::new_menu, "Machine Pistols", retropack_storage(1, "Weapons"));
+    self add_option(&"LUA_MENU_ASSAULT_RIFLES_CAPS", ::new_menu, "Assault Rifles", retropack_storage(1, "Weapons"));
+    self add_option(&"LUA_MENU_SMGS_CAPS", ::new_menu, "Submachine Guns", retropack_storage(1, "Weapons"));
+    self add_option(&"LUA_MENU_LMGS_CAPS", ::new_menu, "Light Machine Guns", retropack_storage(1, "Weapons"));
+    self add_option(&"LUA_MENU_LAUNCHERS_CAPS", ::new_menu, "Launchers", retropack_storage(1, "Weapons"));
+    self add_option(&"LUA_MENU_MELEE1_CAPS", ::new_menu, "Melee", retropack_storage(1, "Weapons"));
     if (self.previous[self.previous.size - 1] == "Home") {
       self add_option("Miscellaneous", ::new_menu, "Misc");
     }
@@ -531,44 +538,32 @@ menu_index() {
     self add_menu(menu);
     self add_option("Spawn Care Package", ::do_crate);
     self add_option("Delete Care Packages", ::delete_carepack);
-    self add_category("Give Streak");
-    self add_string("UAV", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "radar_mp;UAV");
-    self add_string("Care Package", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "airdrop_marker_mp;Care Package");
-    self add_string("Counter-UAV", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "counter_radar_mp;Counter-UAV");
-    self add_string("Sentry Gun", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "sentry_mp;Sentry Gun");
-    self add_string("Predator Missile", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "predator_mp;Predator Missile");
-    self add_string("Precision Airstrike", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "airstrike_mp;Precision Airstrike");
-    self add_string("Attack Helicopter", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "helicopter_mp;Attack Helicopter");
-    self add_string("Harrier Strike", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "harrier_airstrike_mp;Harrier Strike");
-    self add_string("Pavelow", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "pavelow_mp;Pavelow");
-    self add_string("Emergency Airdrop", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "airdrop_mega_marker_mp;Emergency Airdrop");
-    self add_string("Stealth Bomber", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "stealth_airstrike_mp;Stealth Bomber");
-    self add_string("Chopper Gunner", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "chopper_gunner_mp;Chopper Gunner");
-    self add_string("AC130", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "ac130_mp;AC130");
-    self add_string("EMP", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "emp_mp;EMP");
-    self add_string("Tactical Nuke", false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "nuke_mp;Tactical Nuke");
-    break;
-  case "Bots":
-    self add_menu(menu);
-    self add_string("Spawn Bot", false, ::spawn_bot, [getOtherTeam(self.team), self.team]);
-    if (self ishost() || isDefined(self.pers["rp_host"]) && self.pers["rp_host"])
-      self add_string("Spawn Bot Fill", false, ::spawn_bot_wrapper, [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16], "fill");
-    self add_string("Bots to Crosshairs", false, ::do_teleport_bots, [getOtherTeam(self.team), self.team, "All"]);
-    self add_string("Bots to You", false, ::do_teleport_bots_to_you, [getOtherTeam(self.team), self.team, "All"]);
-    self add_string("Freeze/Unfreeze Bots", false, ::toggle_bot_freeze, [getOtherTeam(self.team), self.team, "All"]);
-    self add_string("Randomise Bot Levels", false, ::func_randomise_bot_levels, [getOtherTeam(self.team), self.team, "All"]);
-    self add_string("Kill Bots", false, ::func_bot_kick_or_kill, [getOtherTeam(self.team), self.team, "All"], "kill");
-    self add_string("Kick Bots", false, ::func_bot_kick_or_kill, [getOtherTeam(self.team), self.team, "All"], "kick");
+    self add_divider();
+    self add_integer("UAV", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "radar_mp;UAV");
+    self add_integer("Care Package", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "airdrop_marker_mp;Care Package");
+    self add_integer("Counter-UAV", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "counter_radar_mp;Counter-UAV");
+    self add_integer("Sentry Gun", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "sentry_mp;Sentry Gun");
+    self add_integer("Predator Missile", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "predator_mp;Predator Missile");
+    self add_integer("Precision Airstrike", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "airstrike_mp;Precision Airstrike");
+    self add_integer("Attack Helicopter", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "helicopter_mp;Attack Helicopter");
+    self add_integer("Harrier Strike", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "harrier_airstrike_mp;Harrier Strike");
+    self add_integer("Pavelow", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "pavelow_mp;Pavelow");
+    self add_integer("Emergency Airdrop", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "airdrop_mega_marker_mp;Emergency Airdrop");
+    self add_integer("Stealth Bomber", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "stealth_airstrike_mp;Stealth Bomber");
+    self add_integer("Chopper Gunner", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "chopper_gunner_mp;Chopper Gunner");
+    self add_integer("AC130", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "ac130_mp;AC130");
+    self add_integer("EMP", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "emp_mp;EMP");
+    self add_integer("Tactical Nuke", &"^5x", true, false, ::give_killstreak, [1, 2, 3, 4, 5, 6, 7, 9, 10], "nuke_mp;Tactical Nuke");
     break;
   case "Game":
     self add_menu(menu);
     if (self ishost() || isDefined(self.pers["rp_host"]) && self.pers["rp_host"]) {
       self add_option("Health and Damage", ::new_menu, "Health and Damage");
       self add_toggle("Stop Game Timer", ::do_pause_timer, self.pausetimer);
-      self add_string("Stopwatch", true, ::toggle_autopause, ["Off", 5, 10, 15, 30, 45, 60]);
-      self add_string("Auto-Nuke", true, ::toggle_autonuke, ["Off", 5, 10, 15, 30, 45, 60], false);
+      self add_integer("Stopwatch", &"^5", undefined, true, ::toggle_autopause, [0, 5, 10, 15, 30, 45, 60]);
+      self add_integer("Auto-Nuke", &"^5", undefined, true, ::toggle_autonuke, [0, 5, 10, 15, 30, 45, 60], false);
       if (getDvar("g_gametype") == "sd") {
-        self add_string("Auto-Plant", true, ::toggle_autoplant, ["Off", 5, 10, 15, 30, 45, 60]);
+        self add_integer("Auto-Plant", &"^5", undefined, true, ::toggle_autoplant, [0, 5, 10, 15, 30, 45, 60]);
         self add_toggle("Auto-Defuse", ::toggle_autodefuse, self.pers["auto_defuse"]);
         self add_toggle("Revives", ::toggle_revives, self.pers["revives"]);
       }
@@ -606,7 +601,7 @@ menu_index() {
   case "User":
     self add_menu(menu);
     for (i = 0; i < level.players.size; i++) {
-      if (self.previous[self.previous.size - 1] == "Damage Buffer") {
+      if (self.previous[self.previous.size - 1] == "Binds") {
         self add_toggle(sanitise_name(level.players[i].name), ::toggle_damage_buffer, level.players[i].pers["damage_buffer_victim"], undefined, level.players[i]);
       } else {
         if (level.players[i] != self)
@@ -630,9 +625,9 @@ menu_index() {
     self add_toggle("Print Version At Spawn", ::toggle_spawn_text, self.pers["spawn_text"]);
     self add_toggle("Print Menu Controls", ::toggle_controls_text, self.pers["control_text"]);
     self add_option("Print GUID", ::print_guid, self);
-    self add_category("Spoof Editor");
+    self add_divider();
     self add_shaderarray("Spoof Prestige", false, ::spoof_prestige, ["rank_comm", "h2m_rank_prestige1", "h2m_rank_prestige3", "h2m_rank_prestige4", "h2m_rank_prestige5", "h2m_rank_prestige6", "h2m_rank_prestige7", "h2m_rank_prestige8", "h2m_rank_prestige9", "h2m_rank_prestige10", "h2m_cheytac_ui", "em_st_180"], self, false);
-    self add_string("Spoof Level", false, ::spoof_rank, [1, 5, 25, 69, 70], self, false);
+    self add_integer("Spoof Level", &"^5", undefined, false, ::spoof_rank, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70], self, false);
     self add_increment("Spoof XP Progress", false, ::spoof_xp_bar, 0, 0, 100, 5, self, false);
     break;
   case "Account":
@@ -647,54 +642,57 @@ menu_index() {
     self add_menu(menu);
     if (isDefined(self.pers["cacPrimaryConsole"]) && self.previous[self.previous.size - 1] == "Class" && is_launcher(self.pers["cacPrimaryConsole"]) ||
       isDefined(self.pers["cacSecondaryConsole"]) && self.previous[self.previous.size - 1] == "Class" && is_launcher(self.pers["cacSecondaryConsole"])) {
-      self add_option("None", self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, "None", retropack_storage(1, "Camo"));
+      self add_option(&"PERKS_NONE", self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, "None", retropack_storage(1, "Camo"));
     } else {
-      self add_option("None", self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, "None", retropack_storage(1, "Camo"));
-      self add_option("Random", self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, random_camo(true), retropack_storage(1, "Camo"));
-      self add_shaderarray("Classic", true, self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, ["camo016;h2m_img_camo_desert", "camo017;h2m_img_camo_arctic", "camo018;h2m_img_camo_woodland", "camo019;h2m_img_camo_digital", "camo020;h2m_img_camo_urban", "camo021;h2m_img_camo_blue_tiger", "camo022;h2m_img_camo_red_tiger", "camo023;h2m_img_camo_orange_fall", "gold;h2m_img_camo_gold", "golddiamond;h2m_img_camo_diamond", "toxicwaste;h2m_img_camo_toxic_waste"], retropack_storage(1, "Camo"));
-      self add_shaderarray("Solid Colour", true, self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, ["camo024;h2m_img_camo_yellow", "camo025;h2m_img_camo_white", "camo026;h2m_img_camo_red", "camo027;h2m_img_camo_purple", "camo028;h2m_img_camo_pink", "camo029;h2m_img_camo_pastel_brown", "camo030;h2m_img_camo_orange", "camo031;h2m_img_camo_light_pink", "camo032;h2m_img_camo_green", "camo033;h2m_img_camo_dark_red", "camo034;h2m_img_camo_dark_green", "camo035;h2m_img_camo_cyan", "camo036;h2m_img_camo_brown", "camo037;h2m_img_camo_blue", "camo038;h2m_img_camo_black"], retropack_storage(1, "Camo"));
-      self add_shaderarray("Polyatomic", true, self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, ["camo041;h2m_img_camo_polyatomic", "camo043;h2m_img_camo_poly_blue", "camo047;h2m_img_camo_poly_cyan", "camo042;h2m_img_camo_poly_dred", "camo045;h2m_img_camo_poly_green", "camo040;h2m_img_camo_poly_orange", "camo044;h2m_img_camo_poly_pink", "camo046;h2m_img_camo_poly_red", "camo039;h2m_img_camo_poly_yellow"], retropack_storage(1, "Camo"));
-      self add_shaderarray("Elemental", true, self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, ["camo052;h2m_img_camo_ice", "camo049;h2m_img_camo_lava", "camo053;h2m_img_camo_storm", "camo050;h2m_img_camo_water", "camo051;h2m_img_camo_fire", "camo048;h2m_img_camo_gas"], retropack_storage(1, "Camo"));
-      self add_shaderarray("Bonus", true, self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, ["camo057;h2m_img_camo_doomsday", "camo054;h2m_img_camo_nuclear_blue", "camo056;h2m_img_camo_nuclear_red", "camo058;h2m_img_camo_soaring"], retropack_storage(1, "Camo"));
-    }
+	  self add_option(&"PERKS_NONE", self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, "None", retropack_storage(1, "Camo"));
+      if(self.previous[self.previous.size - 1] == "Weapons")
+	    self add_option("Random", self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, random_camo(true), retropack_storage(1, "Camo"));
+	  if(self.previous[self.previous.size - 1] == "Class" && isDefined(self.pers["cac" + retropack_storage(1, "Weapons") + "Shader"]) || self.previous[self.previous.size - 1] != "Class") {
+	    self add_shaderarray("Classic", true, self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, ["camo016;h2m_img_camo_desert", "camo017;h2m_img_camo_arctic", "camo018;h2m_img_camo_woodland", "camo019;h2m_img_camo_digital", "camo020;h2m_img_camo_urban", "camo021;h2m_img_camo_blue_tiger", "camo022;h2m_img_camo_red_tiger", "camo023;h2m_img_camo_orange_fall", "gold;h2m_img_camo_gold", "golddiamond;h2m_img_camo_diamond", "toxicwaste;h2m_img_camo_toxic_waste"], retropack_storage(1, "Camo"));
+        self add_shaderarray("Solid Colour", true, self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, ["camo024;h2m_img_camo_yellow", "camo025;h2m_img_camo_white", "camo026;h2m_img_camo_red", "camo027;h2m_img_camo_purple", "camo028;h2m_img_camo_pink", "camo029;h2m_img_camo_pastel_brown", "camo030;h2m_img_camo_orange", "camo031;h2m_img_camo_light_pink", "camo032;h2m_img_camo_green", "camo033;h2m_img_camo_dark_red", "camo034;h2m_img_camo_dark_green", "camo035;h2m_img_camo_cyan", "camo036;h2m_img_camo_brown", "camo037;h2m_img_camo_blue", "camo038;h2m_img_camo_black"], retropack_storage(1, "Camo"));
+        self add_shaderarray("Polyatomic", true, self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, ["camo041;h2m_img_camo_polyatomic", "camo043;h2m_img_camo_poly_blue", "camo047;h2m_img_camo_poly_cyan", "camo042;h2m_img_camo_poly_dred", "camo045;h2m_img_camo_poly_green", "camo040;h2m_img_camo_poly_orange", "camo044;h2m_img_camo_poly_pink", "camo046;h2m_img_camo_poly_red", "camo039;h2m_img_camo_poly_yellow"], retropack_storage(1, "Camo"));
+        self add_shaderarray("Elemental", true, self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, ["camo052;h2m_img_camo_ice", "camo049;h2m_img_camo_lava", "camo053;h2m_img_camo_storm", "camo050;h2m_img_camo_water", "camo051;h2m_img_camo_fire", "camo048;h2m_img_camo_gas"], retropack_storage(1, "Camo"));
+        self add_shaderarray("Bonus", true, self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, ["camo057;h2m_img_camo_doomsday", "camo054;h2m_img_camo_nuclear_blue", "camo056;h2m_img_camo_nuclear_red", "camo058;h2m_img_camo_soaring"], retropack_storage(1, "Camo"));
+	  }
+	}
     break;
   case "Class":
     self add_menu(menu);
-    self add_label("Primary:", self.pers["cacPrimaryName"], ::new_menu, "Weapons", "Primary");
-    self add_label("Attachment 2:", self.pers["cacPrimaryAttachment2Name"], ::new_menu, "Attachment", "Primary");
-    self add_label("Camo:", self.pers["cacPrimaryCamoName"], ::new_menu, "Camo", "Primary");
-    self add_category("Secondary");
-    self add_label("Secondary:", self.pers["cacSecondaryName"], ::new_menu, "Weapons", "Secondary");
-    self add_label("Attachment 2:", self.pers["cacSecondaryAttachment2Name"], ::new_menu, "Attachment", "Secondary");
-    self add_label("Camo:", self.pers["cacSecondaryCamoName"], ::new_menu, "Camo", "Secondary");
-    self add_category("Equipment");
-    self add_label("Equipment:", self.pers["cacEquipmentName"], ::new_menu, "Equipment");
-    self add_label("Off Hand:", self.pers["cacOffHandName"], ::new_menu, "Offhand");
-    self add_category("Perks");
+	self add_shaderlabel("Primary:", self.pers["cacPrimaryShader"], self.pers["cacPrimaryAttachment1Shader"], self.pers["cacPrimaryShaderX"], self.pers["cacPrimaryShaderY"], ::new_menu, "Weapons", "Primary");
+    self add_shaderlabel("2nd Attachment:", self.pers["cacPrimaryAttachment2Shader"], undefined, self.pers["cacPrimaryAttachment2ShaderX"], self.pers["cacPrimaryAttachment2ShaderY"], ::new_menu, "Attachment", "Primary");
+    self add_shaderlabel("Camo:", self.pers["cacPrimaryCamoShader"], undefined, self.pers["cacPrimaryCamoShaderX"], self.pers["cacPrimaryCamoShaderY"], ::new_menu, "Camo", "Primary");
+    self add_divider();
+	self add_shaderlabel("Secondary:", self.pers["cacSecondaryShader"], self.pers["cacSecondaryAttachment1Shader"], self.pers["cacSecondaryShaderX"], self.pers["cacSecondaryShaderY"], ::new_menu, "Weapons", "Secondary");
+    self add_shaderlabel("2nd Attachment:", self.pers["cacSecondaryAttachment2Shader"], undefined, self.pers["cacSecondaryAttachment2ShaderX"], self.pers["cacSecondaryAttachment2ShaderY"], ::new_menu, "Attachment", "Secondary");
+    self add_shaderlabel("Camo:", self.pers["cacSecondaryCamoShader"], undefined, self.pers["cacSecondaryCamoShaderX"], self.pers["cacSecondaryCamoShaderY"], ::new_menu, "Camo", "Secondary");
+    self add_divider();
+	self add_shaderlabel("Equipment:", self.pers["cacEquipmentShader"], undefined, 12, 12, ::new_menu, "Equipment");
+    self add_label("Off Hand:", self.pers["cacOffHandName"], ::new_menu, "Offhand"); // can't precache anymore shaders :(
+    self add_divider();
     self add_label("Perk 1:", self.pers["cacPerkName1"], ::new_menu, "Perks", 1);
     self add_label("Perk 2:", self.pers["cacPerkName2"], ::new_menu, "Perks", 2);
     self add_label("Perk 3:", self.pers["cacPerkName3"], ::new_menu, "Perks", 3);
-    self add_category("Save Options");
+    self add_divider();
     self add_option("Give Class", ::give_rpclass);
-    self add_string("Save as Custom Class", false, ::set_rpclass, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+    self add_integer("Save as Custom Class", &"^5", undefined, false, ::set_rpclass, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
     break;
   case "Equipment":
     self add_menu(menu);
-    self add_option("None", ::select_equipment_rp, "None");
-    self add_option("Frag Grenade", ::select_equipment_rp, "h1_fraggrenade_mp;Frag Grenade");
-    self add_option("Semtex", ::select_equipment_rp, "h2_semtex_mp;Semtex");
-    self add_option("Throwing Knife", ::select_equipment_rp, "iw9_throwknife_mp;Throwing Knife");
-    self add_option("Tactical Insert", ::select_equipment_rp, "specialty_tacticalinsertion;Tact. Insert");
-    self add_option("Blast Shield", ::select_equipment_rp, "specialty_blastshield;Blast Shield");
-    self add_option("Claymore", ::select_equipment_rp, "h1_claymore_mp;Claymore");
-    self add_option("C4", ::select_equipment_rp, "h1_c4_mp;C4");
+    self add_option(&"PERKS_NONE", ::select_equipment_rp, "None");
+	self add_shaderoption("weapon_fraggrenade", false, 12, 12, ::select_equipment_rp, [ "h1_fraggrenade_mp;Frag Grenade" ], "weapon_fraggrenade");
+	self add_shaderoption("weapon_semtex", false, 12, 12, ::select_equipment_rp, [ "h2_semtex_mp;Semtex" ], "weapon_semtex");
+	self add_shaderoption("weapon_throwingknife", false, 12, 12, ::select_equipment_rp, [ "iw9_throwknife_mp;Throwing Knife" ], "weapon_throwingknife");
+	self add_shaderoption("dpad_tacticalinsert", false, 12, 12, ::select_equipment_rp, [ "specialty_tacticalinsertion;Tact. Insert" ], "dpad_tacticalinsert");
+	self add_shaderoption("weapon_blastshield", false, 12, 12, ::select_equipment_rp, [ "specialty_blastshield;Blast Shield" ], "weapon_blastshield");
+	self add_shaderoption("h2m_weapon_claymore", false, 12, 12, ::select_equipment_rp, [ "h1_claymore_mp;Claymore" ], "h2m_weapon_claymore");
+	self add_shaderoption("h2m_weapon_c4", false, 12, 12, ::select_equipment_rp, [ "h1_c4_mp;C4" ], "h2m_weapon_c4");
     break;
   case "Offhand":
     self add_menu(menu);
-    self add_option("None", ::select_offhand_rp, "None");
-    self add_option("Smoke Grenade", ::select_offhand_rp, "h1_smokegrenade_mp;Smoke Grenade");
-    self add_option("Stun Grenade", ::select_offhand_rp, "h1_concussiongrenade_mp;Stun Grenade");
-    self add_option("Flash Grenade", ::select_offhand_rp, "h1_flashgrenade_mp;Flash Grenade");
+    self add_option(&"PERKS_NONE", ::select_offhand_rp, "None");
+    self add_option(&"WEAPON_SMOKE_GRENADE", ::select_offhand_rp, "h1_smokegrenade_mp;Smoke Grenade");
+    self add_option(&"WEAPON_STUN_GRENADE", ::select_offhand_rp, "h1_concussiongrenade_mp;Stun Grenade");
+    self add_option(&"WEAPON_FLASH_GRENADE", ::select_offhand_rp, "h1_flashgrenade_mp;Flash Grenade");
     break;
   case "Attachment":
     self add_menu(menu);
@@ -763,8 +761,7 @@ menu_index() {
       if (isSubStr((retropack_storage(1, "Attachment") == "Primary") ? self.pers["cacPrimaryBase"] : self.pers["cacSecondaryBase"], "h2_aug") && i == 14) {
         continue;
       }
-
-      self add_option(get_localised_attachment(attachment), ::select_attachment_rp, attachment, retropack_storage(1, "Attachment"));
+		self add_shaderoption(get_attachment(attachment), false, 12, 12, ::select_attachment_rp, undefined, attachment, retropack_storage(1, "Weapons"), get_attachment(attachment));
     }
     break;
   case "Perks":
@@ -774,18 +771,24 @@ menu_index() {
 
     if (self.previous[self.previous.size - 1] != "Class") {
       self add_toggle("Perks Stick", ::toggle_flag_perk, self.pers["flag_perk"]);
-      self add_category("Perks");
+      self add_divider();
     }
     for (i = 1; i < 33; i++) {
       perk = tableLookup("mp/perkTable.csv", 0, i, 1);
-      name = get_localised_perk(perk);
+	  name = get_localised_perk_hardcoded(perk);
       if (!isSubStr(perk, "specialty_"))
         continue;
+	
+	  if (i == 2 || i == 4 || i == 6 || i == 8 || i == 10 || i == 12 || i == 14 || i == 16 || i == 18 || i == 20 || i == 22 || i == 24 || i == 26 || i == 28 || i == 30 ||  i == 32)
+        continue;
 
-      if (self maps\mp\_utility::_hasPerk(perk) || isDefined(self.pers["set_" + perk]) && self.pers["set_" + perk])
+      if (self maps\mp\_utility::_hasPerk(perk) || isDefined(self.pers["set_" + perk]) && self.pers["set_" + perk]) {
         self.pers["set_" + perk] = true;
-      else
+		self.pers["set_" + get_perk_upgrade(perk)] = true;
+      } else {
         self.pers["set_" + perk] = false;
+		self.pers["set_" + get_perk_upgrade(perk)] = false;
+	  }
 
       if (self.previous[self.previous.size - 1] != "Class") {
         self add_toggle(name, ::toggle_perk, self.pers["set_" + perk], undefined, perk);
@@ -827,7 +830,7 @@ player_index(player) {
     self add_toggle("Co-Host", ::toggle_cohost, player.pers["rp_host"], undefined, player);
   if (!player ishost()) {
     self add_shaderarray("Spoof Prestige", false, ::spoof_prestige, ["rank_comm", "h2m_rank_prestige1", "h2m_rank_prestige3", "h2m_rank_prestige4", "h2m_rank_prestige5", "h2m_rank_prestige6", "h2m_rank_prestige7", "h2m_rank_prestige8", "h2m_rank_prestige9", "h2m_rank_prestige10", "h2m_cheytac_ui", "em_st_180"], player, false);
-    self add_string("Spoof Level", false, ::spoof_rank, [1, 5, 25, 69, 70], player, false);
+    self add_integer("Spoof Level", &"^5", undefined, false, ::spoof_rank, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70], player, false);
   }
   self set_menu("Player_" + player.name);
   self create_option();

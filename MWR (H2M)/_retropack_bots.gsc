@@ -12,11 +12,11 @@
 ▒██▒ ░  ░▓█   ▓██▒ ▓███▀ ▒██▒ █▓█   ▓██░▒▓███▀░▒████▒
 ▒▓▒░ ░  ░▒▒   ▓▒█░ ░▒ ▒  ▒ ▒▒ ▓▒▒   ▓▒█░░▒   ▒░░ ▒░
 ░▒ ░      ▒   ▒▒ ░ ░  ▒  ░ ░▒ ▒░▒   ▒▒ 
-░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.2░
+░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.3
 
 Developer: @rtros
-Date: October 1, 2024
-Compatibility: Modern Warfare Remastered (HM2 Mod)
+Date: April 1, 2025
+Compatibility: Modern Warfare Remastered (H2M/HMW Mod)
 
 Notes:
 - N/A

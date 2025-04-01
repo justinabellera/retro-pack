@@ -12,19 +12,60 @@
 ▒██▒ ░  ░▓█   ▓██▒ ▓███▀ ▒██▒ █▓█   ▓██░▒▓███▀░▒████▒
 ▒▓▒░ ░  ░▒▒   ▓▒█░ ░▒ ▒  ▒ ▒▒ ▓▒▒   ▓▒█░░▒   ▒░░ ▒░
 ░▒ ░      ▒   ▒▒ ░ ░  ▒  ░ ░▒ ▒░▒   ▒▒ 
-░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.2░
+░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.3
 
 Developer: @rtros
-Date: October 1, 2024
-Compatibility: Modern Warfare Remastered (HM2 Mod)
+Date: April 1, 2025
+Compatibility: Modern Warfare Remastered (H2M/HMW Mod)
 
 Notes:
 - N/A
 */
 
 #include scripts\mp\_retropack_utility;
-
 #include scripts\mp\_retropack_functions;
+
+retropack_binds(){
+	level.bind_index[0] = "damagebuffer";
+	level.bind_index[1] = "canswap";
+	level.bind_index[2] = "zoom";
+	level.bind_index[3] = "cpnac";
+	level.bind_index[4] = "prednac";
+	level.bind_index[5] = "smooth";
+	level.bind_index[6] = "mantle";
+	level.bind_index[7] = "running";
+	level.bind_index[8] = "knifeanim";
+	level.bind_index[9] = "inspect";
+	level.bind_index[10] = "cockback";
+	level.bind_index[11] = "emptymag";
+	level.bind_index[12] = "lastbullet";
+	level.bind_index[13] = "reload";
+	level.bind_index[14] = "invisible";
+	level.bind_index[15] = "fastglide";
+	level.bind_index[16] = "gflip";
+	level.bind_index[17] = "altswap";
+	level.bind_index[18] = "doemp";
+	level.bind_index[19] = "classchange";
+	level.bind_index[20] = "damage";
+	level.bind_index[21] = "scavenger";
+	level.bind_index[22] = "hitmarker";
+	level.bind_index[23] = "flash";
+	level.bind_index[24] = "thirdeye";
+	level.bind_index[25] = "laststand";
+	level.bind_index[26] = "finalstand";
+	level.bind_index[27] = "destroytac";
+	level.bind_index[28] = "omashax";
+	level.bind_index[29] = "bolt";
+	level.bind_index[30] = "velocity";
+	level.bind_index[31] = "stuck";
+	level.bind_index[32] = "blastshield";
+	level.bind_index[33] = "painkiller";
+	level.bind_index[34] = "copycat";
+	level.bind_index[35] = "vish";
+	level.bind_index[36] = "repeater";
+	level.bind_index[37] = "instaswap";
+	level.bind_index[38] = "nacmod";
+}
 
 /* 
 	Bind Utils()
@@ -40,55 +81,14 @@ look_at_bot() {
 }
 
 call_binds(player) {
-  foreach(index, bind in [
-    "damagebuffer",
-    "obituary",
-    "canswap",
-    "zoom",
-    "cpnac",
-    "prednac",
-    "smooth",
-    "mantle",
-    "running",
-    "knifeanim",
-    "inspect",
-    "cockback",
-    "emptymag",
-	"emptymag_real",
-	"lastbullet",
-    "reload",
-    "invisible",
-    "fastglide",
-    "gflip",
-    "altswap",
-    "doemp",
-    "classchange",
-    "damage",
-    "scavenger",
-    "hitmarker",
-    "flash",
-    "thirdeye",
-    "laststand",
-    "finalstand",
-    "destroytac",
-    "omashax",
-    "bolt",
-    "velocity",
-    "stuck",
-    "blastshield",
-    "painkiller",
-    "copycat",
-    "vish",
-    "repeater",
-    "instaswap",
-    "nacmod"
-  ]) {
+  foreach( bind in level.bind_index ) {
     player endon("stop" + bind);
     if (player.pers["bind_" + bind]) {
       player thread[[player.pers["bind_" + bind + "_function"]]](player.pers["bind_" + bind + "_button"], player.pers["bind_" + bind + "_bind"], isDefined(player.pers["bind_" + bind + "_arg"]) ? player.pers["bind_" + bind + "_arg"] : undefined);
     }
   }
 }
+
 
 /* 
 	Toggle()

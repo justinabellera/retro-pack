@@ -12,11 +12,11 @@
 ▒██▒ ░  ░▓█   ▓██▒ ▓███▀ ▒██▒ █▓█   ▓██░▒▓███▀░▒████▒
 ▒▓▒░ ░  ░▒▒   ▓▒█░ ░▒ ▒  ▒ ▒▒ ▓▒▒   ▓▒█░░▒   ▒░░ ▒░
 ░▒ ░      ▒   ▒▒ ░ ░  ▒  ░ ░▒ ▒░▒   ▒▒ 
-░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.2░
+░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.3
 
 Developer: @rtros
-Date: October 1, 2024
-Compatibility: Modern Warfare Remastered (HM2 Mod)
+Date: April 1, 2025
+Compatibility: Modern Warfare Remastered (H2M/HMW Mod)
 
 Notes:
 - N/A
@@ -538,7 +538,13 @@ monitor_weapon_change() {
 
     if (self.pers["raise_type"] == "Instashoot" && should_raise(weapon)) {
       self setSpawnWeapon(weapon);
-    } else if (self.pers["raise_type"] == "Can Swap" && should_raise(weapon)) {
+    } else if (self.pers["raise_type"] == "Sprint" && should_raise(weapon)) {
+      self setSpawnWeapon(weapon);
+	  self force_play_weap_anim(33, 33);
+	} else if (self.pers["raise_type"] == "Invisible" && should_raise(weapon)) {
+      self setSpawnWeapon(weapon);
+	  self force_play_weap_anim(17, 17);
+	} else if (self.pers["raise_type"] == "Can Swap" && should_raise(weapon)) {
       self scripts\mp\_retropack_binds::do_can(weapon);
     } else if (self.pers["raise_type"] == "Can Zoom" && should_raise(weapon)) {
       self scripts\mp\_retropack_binds::do_can(weapon, true);
@@ -900,7 +906,7 @@ toggle_damage_buffer(victim) {
 }
 
 toggle_autonuke(seconds) {
-  if (seconds != "Off") {
+  if (seconds != 0) {
     self thread do_auto_nuke(seconds);
     self.pers["auto_nuke"] = seconds;
     self iPrintln("Auto-Nuke: ^5at " + seconds + " seconds");
@@ -912,7 +918,7 @@ toggle_autonuke(seconds) {
 }
 
 toggle_autoplant(seconds) {
-  if (seconds != "Off") {
+  if (seconds != 0) {
     self thread do_autoplant(seconds);
     self.pers["auto_plant"] = seconds;
     self iPrintln("Auto-Plant: ^5at " + seconds + " seconds");
@@ -924,7 +930,7 @@ toggle_autoplant(seconds) {
 }
 
 toggle_autopause(seconds) {
-  if (seconds != "Off") {
+  if (seconds != 0) {
     self thread do_timer_pause(seconds);
     self.pers["auto_pause"] = seconds;
     self iPrintln("Timer will pause at ^5" + seconds + " seconds ^7remaining");
@@ -1004,13 +1010,27 @@ toggle_hardcore() {
 
 toggle_perk(perk) {
   if (!self maps\mp\_utility::_hasPerk(perk) || !self.pers["set_" + perk]) {
+	if(getDvarInt("rp_revives") == 1 && perk == "specialty_pistoldeath")
+	  self maps\mp\_utility::giveperk("specialty_finalstand");
     self maps\mp\_utility::giveperk(perk);
+	self maps\mp\_utility::giveperk(get_perk_upgrade(perk));
     self.pers["set_" + perk] = true;
+	self.pers["set_" + get_perk_upgrade(perk)] = true;
     maps\mp\perks\_perks::applyperks();
+	self iprintln(get_localised_perk_hardcoded(perk) + ": ^5Given");
+	self iprintln(get_localised_perk_hardcoded(get_perk_upgrade(perk)) + ": ^5Given");
   } else if (self maps\mp\_utility::_hasPerk(perk) || self.pers["set_" + perk]) {
-    self maps\mp\_utility::_unsetperk(perk);
+    if(getDvarInt("rp_revives") == 1 && perk == "specialty_pistoldeath") {
+	  self iprintln("Turn ^5OFF ^7revives to remove ^7this perk.");
+	  return;
+	}
+	self maps\mp\_utility::_unsetperk(perk);
+	self maps\mp\_utility::_unsetperk(get_perk_upgrade(perk));
     self.pers["set_" + perk] = false;
+	self.pers["set_" + get_perk_upgrade(perk)] = false;
     maps\mp\perks\_perks::applyperks();
+	self iprintln(get_localised_perk_hardcoded(perk) + ": ^5Removed");
+	self iprintln(get_localised_perk_hardcoded(get_perk_upgrade(perk)) + ": ^5Removed");
   }
 }
 
@@ -1128,30 +1148,30 @@ toggle_raise_weapon() {
     self notify("end_insta");
 
   }
-  self iPrintln("Always Raise Weapon: ^5" + self.pers["raise_type"] + "^7 for ^5" + text);
+  self iPrintln("Raise Weapon: ^5" + self.pers["raise_type"] + "^7 for ^5" + text);
 }
 
 toggle_raise_status() {
   if (!self.pers["do_raise"]) {
     if (!isDefined(self.pers["raise_type"]) && isDefined(self.pers["raise_weapon"])) {
-      self iprintln("Always Raise: ^5Select an Always Raise Option");
+      self iprintln("Raise: ^5Select an Raise Option");
       return;
     } else if (!isDefined(self.pers["raise_weapon"]) && isDefined(self.pers["raise_type"])) {
-      self iprintln("Always Raise: ^5Select an Always Raise Weapon");
+      self iprintln("Raise: ^5Select an Raise Weapon");
       return;
     } else if (!isDefined(self.pers["raise_weapon"]) && !isDefined(self.pers["raise_type"])) {
-      self iprintln("Always Raise: ^5Select both an Always Raise Weapon & Always Raise Option");
+      self iprintln("Raise: ^5Select both an Raise Weapon & Raise Option");
       return;
     }
     self.pers["do_raise"] = true;
     self notify("end_insta");
     self thread monitor_weapon_change();
-    self iprintln("Always Raise: ^5On");
+    self iprintln("Raise: ^5On");
 
   } else if (self.pers["do_raise"]) {
     self.pers["do_raise"] = false;
     self notify("end_insta");
-    self iPrintln("Always Raise: ^5Off");
+    self iPrintln("Raise: ^5Off");
   }
 }
 
@@ -1534,27 +1554,40 @@ do_class_change() {
         perk = tableLookup(table, 0, i, 1);
         if (!isSubStr(perk, "specialty_"))
           continue;
+	  
+        if(getDvar("g_gametype") == "sd" && getDvarInt("rp_revives") == 1 && perk == "specialty_pistoldeath") {
+          self.pers["set_specialty_finalstand"] = true;
+		  self maps\mp\_utility::giveperk("specialty_finalstand");
+		}
 
         if (isDefined(self.pers["flag_perk"]) && self.pers["flag_perk"]) {
           self.pers["flag_perk"] = true;
           if (self maps\mp\_utility::_hasPerk(perk) && !isDefined(self.pers["set_" + perk]) || self maps\mp\_utility::_hasPerk(perk) && isDefined(self.pers["set_" + perk]) && self.pers["set_" + perk]) {
             self.pers["set_" + perk] = true;
+			self.pers["set_" + get_perk_upgrade(perk)] = true;
           } else if (!self maps\mp\_utility::_hasPerk(perk) && !isDefined(self.pers["set_" + perk]) || !self maps\mp\_utility::_hasPerk(perk) && isDefined(self.pers["set_" + perk]) && !self.pers["set_" + perk]) {
             self.pers["set_" + perk] = false;
+			self.pers["set_" + get_perk_upgrade(perk)] = false;
           } else if (self maps\mp\_utility::_hasPerk(perk) && isDefined(self.pers["set_" + perk]) && !self.pers["set_" + perk]) {
             self.pers["set_" + perk] = false;
+			self.pers["set_" + get_perk_upgrade(perk)] = false;
             self maps\mp\_utility::_unsetperk(perk);
+			self maps\mp\_utility::_unsetperk(get_perk_upgrade(perk));
           } else if (!self maps\mp\_utility::_hasPerk(perk) && isDefined(self.pers["set_" + perk]) && self.pers["set_" + perk]) {
             self.pers["set_" + perk] = true;
+			self.pers["set_" + get_perk_upgrade(perk)] = true;
             self maps\mp\_utility::giveperk(perk);
+			self maps\mp\_utility::giveperk(get_perk_upgrade(perk));
             maps\mp\perks\_perks::applyperks();
           }
         } else if (!isDefined(self.pers["flag_perk"]) || isDefined(self.pers["flag_perk"]) && !self.pers["flag_perk"]) {
           self.pers["flag_perk"] = false;
           if (self maps\mp\_utility::_hasPerk(perk)) {
             self.pers["set_" + perk] = true;
+			self.pers["set_" + get_perk_upgrade(perk)] = true;
           } else if (!self maps\mp\_utility::_hasPerk(perk)) {
             self.pers["set_" + perk] = false;
+			self.pers["set_" + get_perk_upgrade(perk)] = false;
           }
         }
       }
@@ -2251,7 +2284,6 @@ set_challenges() {
   self.pers["god_mode"] = true;
   chalProgress = 0;
   useBar = createPrimaryProgressBar(25);
-  useBarText = createPrimaryProgressBarText(25);
   foreach(challengeRef, challengeData in level.challengeInfo) {
     finalTarget = 0;
     finalTier = 0;
@@ -2265,7 +2297,6 @@ set_challenges() {
     }
     chalProgress++;
     chalPercent = ceil(((chalProgress / 486) * 100));
-    useBarText setText(chalPercent + "/100");
     useBar updateBar(chalPercent / 100);
     waitframe();
   }
@@ -2273,7 +2304,6 @@ set_challenges() {
   self maps\mp\gametypes\_persistence::statset("experience", 99999999);
   self maps\mp\gametypes\_persistence::statset("prestige", 10);
   useBar destroyElem();
-  useBarText destroyElem();
   self iPrintLnBold("Unlock All Completed");
   wait 1.5;
   self.pers["god_mode"] = false;
@@ -2294,7 +2324,7 @@ set_raise_type(type) {
     self notify("end_insta");
     self thread monitor_weapon_change();
   }
-  self iPrintln("Always Raise: ^5" + type);
+  self iPrintln("Raise: ^5" + type);
 }
 
 set_afterhit_type(type) {
@@ -2479,29 +2509,39 @@ spoof_bot_level(team) {
 	Retro Package: Class Creator
 */
 
-select_offhand_rp(offhand) {
+select_offhand_rp(offhand, shader) {
   sep = strTok(offhand, ";");
 
   self.pers["cacOffHandName"] = sep[1];
   self.pers["cacOffHand"] = sep[0];
-  if (offhand == "none")
-    self iPrintLn("^5RETROPACK: ^7Nothing selected as Off-hand");
-  else
+  if (offhand == "None" || offhand == "none" || !isDefined(offhand) || offhand == "") {
+    self.pers["cacOffHandName"] = undefined;
+    self.pers["cacOffHand"] = undefined;
+	self iPrintLn("^5RETROPACK: ^7Nothing selected as Off-hand");
+  } else
     self iPrintLn("^5RETROPACK: ^7" + sep[1] + " selected as Off-hand");
 }
 
-select_equipment_rp(equipment) {
+select_equipment_rp(equipment, shader) {
   sep = strTok(equipment, ";");
 
   self.pers["cacEquipmentName"] = sep[1];
+  self.pers["cacEquipmentShader"] = shader;
   self.pers["cacEquipment"] = sep[0];
-  if (equipment == "none")
+  if (equipment == "None" || equipment == "none" || !isDefined(equipment) || equipment == "") {
+    self.pers["cacEquipmentShader"] = undefined;
     self iPrintLn("^5RETROPACK: ^7Nothing selected as Equipment");
-  else
+  } else
     self iPrintLn("^5RETROPACK: ^7" + sep[1] + " selected as Equipment");
 }
 
-select_attachment_rp(attachment, type) {
+select_attachment_rp(attachment, type, shader) {
+  if (isDefined(self.pers["cac" + type + "Attachment2Shader"]))
+    self.pers["cac" + type + "Attachment2Shader"] = undefined;
+  if (isDefined(self.pers["cac" + type + "Attachment2ShaderX"]))
+    self.pers["cac" + type + "Attachment2ShaderX"] = undefined;
+  if (isDefined(self.pers["cac" + type + "Attachment2ShaderY"]))
+    self.pers["cac" + type + "Attachment2ShaderY"] = undefined;
   if (isDefined(self.pers["cac" + type + "Attachment2"]))
     self.pers["cac" + type + "Attachment2"] = undefined;
   if (isDefined(self.pers["cac" + type + "Attachment2Name"]))
@@ -2511,10 +2551,16 @@ select_attachment_rp(attachment, type) {
   self.pers["cac" + type + "Attachment2"] = scripts\mp_patches\custom_weapons::furniturekitnametoid(attachment);
   self.pers["cac" + type + "Attachment2Name"] = get_localised_attachment(attachment);
   self.pers["cac" + type + "Attachment2Console"] = attachment;
+  self.pers["cac" + type + "Attachment2Shader"] = shader;
+  self.pers["cac" + type + "Attachment2ShaderX"] = 12;
+  self.pers["cac" + type + "Attachment2ShaderY"] = 12;
 
-  if (attachment == "none")
+  if (attachment == "None" || attachment == "none" || !isDefined(attachment) || attachment == "") {
+    self.pers["cac" + type + "Attachment2Shader"] = undefined;
+    self.pers["cac" + type + "Attachment2ShaderX"] = undefined;
+    self.pers["cac" + type + "Attachment2ShaderY"] = undefined;
     self iPrintLn("^5RETROPACK: ^7Nothing selected as 2nd attachment");
-  else
+  } else
     self iPrintLn("^5RETROPACK: ^7" + get_localised_attachment(attachment) + " selected as 2nd attachment");
 }
 
@@ -2545,9 +2591,19 @@ select_camo_rp(camo, type) {
     self.pers["cac" + type + "CamoName"] = get_localised_camo("_" + sep[0]);
   }
 
-  if (sep[0] == "None")
+  self.pers["cac" + type + "CamoShader"] = undefined;
+  self.pers["cac" + type + "CamoShaderX"] = undefined;
+  self.pers["cac" + type + "CamoShaderY"] = undefined;
+  self.pers["cac" + type + "CamoShader"] = sep[1];
+  self.pers["cac" + type + "CamoShaderX"] = 12;
+  self.pers["cac" + type + "CamoShaderY"] = 12;
+  
+  if (sep[0] == "None" || sep[0] == "none" || !isDefined(sep[0]) || sep[0] == "") {
     self iPrintLn("^5RETROPACK: ^7Nothing selected as Camo");
-  else
+    self.pers["cac" + type + "CamoShader"] = undefined;
+    self.pers["cac" + type + "CamoShaderX"] = undefined;
+    self.pers["cac" + type + "CamoShaderY"] = undefined;
+  } else
     self iPrintLn("^5RETROPACK: ^7" + get_localised_camo("_" + self.pers["cac" + type + "Camo"]) + " selected as " + type + " Camo");
 }
 
@@ -2566,7 +2622,7 @@ select_perk_rp(perk, name, num) {
     self iPrintLn("^5RETROPACK: ^7" + name + " selected as Perk " + num);
 }
 
-select_weapon_rp(weapon, type, name) {
+select_weapon_rp(weapon, type, name, shader, x, y) {
   sep = strTok(weapon, ";");
 
   if (isDefined(self.pers["rp_storage_2_Weapons"]) && self.pers["rp_storage_2_Weapons"] == "Afterhit") {
@@ -2577,6 +2633,9 @@ select_weapon_rp(weapon, type, name) {
   }
 
   if (weapon == "None") {
+    self.pers["cac" + type + "Shader"] = undefined;
+	self.pers["cac" + type + "ShaderX"] = undefined;
+	self.pers["cac" + type + "ShaderY"] = undefined;
     self.pers["cac" + type + "Base"] = undefined;
     self.pers["cac" + type + "Attachment1"] = undefined;
     self.pers["cac" + type + "Camo"] = undefined;
@@ -2594,6 +2653,11 @@ select_weapon_rp(weapon, type, name) {
       self.pers["cac" + type + "CamoID"] = undefined;
     if (isDefined(self.pers["cac" + type + "CamoName"]))
       self.pers["cac" + type + "CamoName"] = undefined;
+    if (isDefined(self.pers["cac" + type + "Attachment2Shader"]))
+      self.pers["cac" + type + "Attachment2Shader"] = undefined;
+    if (isDefined(self.pers["cac" + type + "CamoShader"]))
+      self.pers["cac" + type + "CamoShader"] = undefined;
+  
     self iPrintLn("^5RETROPACK: ^7Nothing selected as weapon");
 
     return;
@@ -2609,6 +2673,7 @@ select_weapon_rp(weapon, type, name) {
   self.pers["cac" + type + "Base"] = undefined;
   self.pers["cac" + type + "Attachment1"] = undefined;
   self.pers["cac" + type + "Attachment1Console"] = undefined;
+  self.pers["cac" + type + "Attachment1Shader"] = undefined;
   self.pers["cac" + type + "Camo"] = undefined;
   self.pers["cac" + type + "CamoID"] = undefined;
   self.pers["cac" + type + "Console"] = undefined;
@@ -2623,8 +2688,12 @@ select_weapon_rp(weapon, type, name) {
   self.pers["cac" + type + "Base"] = getbaseweaponname(weapon);
   self.pers["cac" + type + "Attachment1"] = maps\mp\gametypes\_class::attachkitnametoid(extract_attachment(weapon) == "acog" ? "acogh2" : extract_attachment(weapon));
   self.pers["cac" + type + "Attachment1Console"] = extract_attachment(weapon);
+  self.pers["cac" + type + "Attachment1Shader"] = get_attachment(extract_attachment(weapon));
   self.pers["cac" + type + "Console"] = sep[0];
   self.pers["cac" + type + "Name"] = fullName;
+  self.pers["cac" + type + "Shader"] = shader;
+  self.pers["cac" + type + "ShaderX"] = x;
+  self.pers["cac" + type + "ShaderY"] = y;
 
   if (is_launcher(self.pers["cac" + type + "Console"])) {
     self.pers["cac" + type + "Attachment1"] = undefined;
@@ -2634,7 +2703,6 @@ select_weapon_rp(weapon, type, name) {
     self.pers["cac" + type + "CamoID"] = undefined;
     self.pers["cac" + type + "CamoName"] = undefined;
   }
-
   self iPrintLn("^5RETROPACK: ^7" + getWeaponDisplayName(sep[0]) + " selected as " + type);
 }
 
@@ -2660,9 +2728,16 @@ give_rpclass(spawn) {
   self maps\mp\_utility::giveperk(self.pers["cacPerk1"]);
   self maps\mp\_utility::giveperk(self.pers["cacPerk2"]);
   self maps\mp\_utility::giveperk(self.pers["cacPerk3"]);
+  self maps\mp\_utility::giveperk(get_perk_upgrade(self.pers["cacPerk1"]));
+  self maps\mp\_utility::giveperk(get_perk_upgrade(self.pers["cacPerk2"]));
+  self maps\mp\_utility::giveperk(get_perk_upgrade(self.pers["cacPerk3"]));
   self.pers["set_" + self.pers["cacPerk1"]] = true;
   self.pers["set_" + self.pers["cacPerk2"]] = true;
   self.pers["set_" + self.pers["cacPerk3"]] = true;
+  self.pers["set_" + get_perk_upgrade(self.pers["cacPerk1"])] = true;
+  self.pers["set_" + get_perk_upgrade(self.pers["cacPerk2"])] = true;
+  self.pers["set_" + get_perk_upgrade(self.pers["cacPerk3"])] = true;
+  
   waitframe();
   maps\mp\perks\_perks::applyperks();
 

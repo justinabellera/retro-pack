@@ -12,11 +12,11 @@
 ▒██▒ ░  ░▓█   ▓██▒ ▓███▀ ▒██▒ █▓█   ▓██░▒▓███▀░▒████▒
 ▒▓▒░ ░  ░▒▒   ▓▒█░ ░▒ ▒  ▒ ▒▒ ▓▒▒   ▓▒█░░▒   ▒░░ ▒░
 ░▒ ░      ▒   ▒▒ ░ ░  ▒  ░ ░▒ ▒░▒   ▒▒ 
-░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.2░
+░░        ░   ▒  ░       ░ ░░ ░ ░   ▒       ░ v1.0.3
 
 Developer: @rtros
-Date: October 1, 2024
-Compatibility: Modern Warfare Remastered (HM2 Mod)
+Date: April 1, 2025
+Compatibility: Modern Warfare Remastered (H2M/HMW Mod)
 
 Notes:
 - N/A
@@ -280,6 +280,16 @@ get_next_weapon() {
   }
 }
 
+get_perk_upgrade( perk )
+{
+    perk = tablelookup( "mp/perktable.csv", 1, perk, 8 );
+
+    if ( perk == "" || perk == "specialty_null" )
+        return "specialty_null";
+
+    return perk;
+}
+
 get_viewhands_console(model) {
   if (model == "Infected")
     return "viewhands_infect";
@@ -301,42 +311,42 @@ get_viewhands_console(model) {
 
 get_attachment(attachment) {
   sep = strTok(attachment, ";");
-  if (isEndStr(sep[0], "_mp") || is_launcher(sep[0]) || is_knife(sep[0]))
+  if (isEndStr(sep[0], "mp") || is_launcher(sep[0]) || is_knife(sep[0]))
     return "specialty_null";
-  if (isEndStr(sep[0], "_gl_glpre"))
+  if (isEndStr(sep[0], "gl_glpre") || isEndStr(sep[0], "gl"))
     return "weapon_attachment_shotgun";
-  if (isEndStr(sep[0], "_reflex"))
+  if (isEndStr(sep[0], "reflex"))
     return "h2_reflex";
-  if (isEndStr(sep[0], "_silencerar") ||
-    isEndStr(sep[0], "_silencerlmg") ||
-    isEndStr(sep[0], "_silencersniper") ||
-    isEndStr(sep[0], "_silencerpistol") ||
-    isEndStr(sep[0], "_silencershotgun") ||
-    isEndStr(sep[0], "_silencersmg"))
+  if (isEndStr(sep[0], "silencerar") ||
+    isEndStr(sep[0], "silencerlmg") ||
+    isEndStr(sep[0], "silencersniper") ||
+    isEndStr(sep[0], "silencerpistol") ||
+    isEndStr(sep[0], "silencershotgun") ||
+    isEndStr(sep[0], "silencersmg"))
     return "weapon_attachment_suppressor";
-  if (isEndStr(sep[0], "_acog"))
+  if (isEndStr(sep[0], "acog") || isEndStr(sep[0], "acogh2"))
     return "weapon_attachment_acog";
-  if (isEndStr(sep[0], "_fmj"))
+  if (isEndStr(sep[0], "fmj"))
     return "weapon_attachment_fmj";
-  if (isEndStr(sep[0], "_sho_shopre"))
+  if (isEndStr(sep[0], "sho_shopre") || isEndStr(sep[0], "sho") )
     return "weapon_attachment_shotty";
-  if (isEndStr(sep[0], "_holo"))
+  if (isEndStr(sep[0], "holo"))
     return "weapon_attachment_holographic";
-  if (isEndStr(sep[0], "_thermal"))
+  if (isEndStr(sep[0], "thermal"))
     return "weapon_attachment_thermal2";
-  if (isEndStr(sep[0], "_xmag"))
+  if (isEndStr(sep[0], "xmag"))
     return "weapon_attachment_xmag";
-  if (isEndStr(sep[0], "_fastfire"))
+  if (isEndStr(sep[0], "fastfire"))
     return "weapon_attachment_fastfire";
-  if (isEndStr(sep[0], "_akimbo"))
+  if (isEndStr(sep[0], "akimbo"))
     return "weapon_attachment_akimbo";
-  if (isEndStr(sep[0], "_tacknifeusp") ||
-    isEndStr(sep[0], "_tacknifecolt44") ||
-    isEndStr(sep[0], "_tacknifem9") ||
-    isEndStr(sep[0], "_tacknifedeagle") ||
-    isEndStr(sep[0], "_tacknifecolt45"))
+  if (isEndStr(sep[0], "tacknifeusp") ||
+    isEndStr(sep[0], "tacknifecolt44") ||
+    isEndStr(sep[0], "tacknifem9") ||
+    isEndStr(sep[0], "tacknifedeagle") ||
+    isEndStr(sep[0], "tacknifecolt45"))
     return "weapon_attachment_tacknife";
-  if (isEndStr(sep[0], "_foregrip"))
+  if (isEndStr(sep[0], "foregrip"))
     return "weapon_attachment_grip";
 }
 
@@ -467,6 +477,85 @@ get_localised_attachment(attachment) {
 }
 
 get_localised_perk(perk) {
+  for (i = 1; i < tablegetrowcount("mp/perktable.csv"); i++) {
+    table = tableLookup("mp/perktable.csv", 0, i, 1);
+    if (perk != table)
+		continue;
+	
+    return tableLookup("mp/perktable.csv", 0, i, 2);
+  }
+}
+
+get_localised_perk_hardcoded(perk) {
+  if (perk == "specialty_longersprint")
+    return &"PERKS_MARATHON";
+  else if (perk == "specialty_fastmantle")
+    return &"PERKS_MARATHON_PRO";
+  else if (perk == "specialty_quickdraw")
+    return &"PERKS_SLEIGHT_OF_HAND";
+  else if (perk == "specialty_extraammo")
+    return &"PERKS_SCAVENGER_PRO";
+  else if (perk == "specialty_secondarybling")
+    return &"PERKS_BLING_PRO";
+  else if (perk == "specialty_omaquickchange")
+    return &"PERKS_ONE_MAN_ARMY_PRO";
+  else if (perk == "specialty_armorpiercing")
+    return &"PERKS_STOPPING_POWER_PRO";
+  else if (perk == "specialty_fastsprintrecovery")
+    return &"PERKS_LIGHTWEIGHT_PRO";
+  else if (perk == "specialty_rollover")
+    return &"PERKS_HARDLINE_PRO";
+  else if (perk == "specialty_spygame")
+    return &"PERKS_COLD_BLOODED_PRO";
+  else if (perk == "specialty_dangerclose")
+    return &"PERKS_DANGER_CLOSE_PRO";
+  else if (perk == "specialty_falldamage")
+    return &"PERKS_COMMANDO_PRO";
+  else if (perk == "specialty_holdbreath")
+    return &"PERKS_STEADY_AIM_PRO";
+  else if (perk == "specialty_delaymine")
+    return &"PERKS_SCRAMBLER_PRO";
+  else if (perk == "specialty_quieter")
+    return &"PERKS_NINJA_PRO";
+  else if (perk == "specialty_selectivehearing")
+    return &"PERKS_SITREP_PRO";
+  else if (perk == "specialty_longersprint")
+    return &"PERKS_MARATHON";
+  else if (perk == "specialty_fastreload")
+    return &"PERKS_SLEIGHT_OF_HAND";
+  else if (perk == "specialty_scavenger")
+    return &"PERKS_SCAVENGER";
+  else if (perk == "specialty_bling")
+    return &"PERKS_BLING";
+  else if (perk == "specialty_onemanarmy")
+    return &"PERKS_ONE_MAN_ARMY";
+  else if (perk == "specialty_bulletdamage")
+    return &"PERKS_STOPPING_POWER";
+  else if (perk == "specialty_lightweight")
+    return &"PERKS_LIGHTWEIGHT";
+  else if (perk == "specialty_hardline")
+    return &"PERKS_HARDLINE";
+  else if (perk == "specialty_radarimmune")
+    return &"PERKS_COLD_BLOODED";
+  else if (perk == "specialty_explosivedamage")
+    return &"PERKS_DANGER_CLOSE";
+  else if (perk == "specialty_extendedmelee")
+    return &"PERKS_COMMANDO";
+  else if (perk == "specialty_bulletaccuracy")
+    return &"PERKS_STEADY_AIM";
+  else if (perk == "specialty_localjammer")
+    return &"PERKS_SCRAMBLER";
+  else if (perk == "specialty_heartbreaker")
+    return &"PERKS_NINJA";
+  else if (perk == "specialty_detectexplosive")
+    return &"PERKS_SITREP";
+  else if (perk == "specialty_pistoldeath")
+    return &"PERKS_LAST_STAND";
+  else if (perk == "specialty_laststandoffhand")
+    return &"PERKS_LAST_STAND_PRO";
+}
+
+get_string_perk(perk) {
   if (perk == "specialty_longersprint") // maps\mp\perks\_perks::perktablelookuplocalizedname(perk); also works but dont use
     return "Marathon";
   else if (perk == "specialty_fastmantle")
@@ -532,7 +621,7 @@ get_localised_perk(perk) {
   else if (perk == "specialty_pistoldeath")
     return "Last Stand";
   else if (perk == "specialty_laststandoffhand")
-    return "Last Stand Pro";
+    return "Final Stand";
 }
 
 get_localised_animation(animation) {
@@ -757,9 +846,9 @@ set_slider(scrolling, index) {
       else
         self.retropack["hud"]["slider"][3][index] setShader(excluded_menu() ? get_attachment(sep[0]) : self.structure[index].array[self.pers["storage_array" + menu + index]], 12, 12);
     } else {
-      if (self get_menu() == "Killstreak" || self get_menu() == "Bots" && index == 1 || self get_menu() == "Class") {
-        self.retropack["hud"]["slider"][4][index] setValue(self.structure[index].array[self.pers["storage_array" + menu + index]]);
-      } else if (self get_menu() == "Bots") {
+	  if (isdefined(self.structure[index].integer)) {
+	    self.retropack["hud"]["slider"][5][index] setValue(self.structure[index].array[self.pers["storage_array" + menu + index]]);
+	  } else if (self.structure[index].text == "Spawn Bot") {
         current = self.structure[index].array[self.slider[storage]];
         if (current == getOtherTeam(self.team))
           current = "^1Enemy";
@@ -769,11 +858,19 @@ set_slider(scrolling, index) {
           current = "^5All";
         self.retropack["hud"]["slider"][0][index] set_text(current);
       } else {
-        self.retropack["hud"]["slider"][0][index] set_text("^5" + self.structure[index].array[self.pers["storage_array" + menu + index]]);
+        if ( isDefined(self.structure[index].bind) && self.structure[index].bind ) {
+          if ( self.structure[index].array[self.pers["storage_array" + menu + index]] != "Off" ) {
+		    self.retropack["hud"]["slider"][0][index] set_text("^5" + self.structure[index].array[self.pers["storage_array" + menu + index]]);
+		  } else {
+			self.retropack["hud"]["slider"][0][index] set_text("");
+		  }
+		} else {
+		  self.retropack["hud"]["slider"][0][index] set_text("^5" + self.structure[index].array[self.pers["storage_array" + menu + index]]);
+		}
       }
-    }
+    } 
   } else {
-    self notify("increment_slider");
+    self notify("increment_slider"); 
     if (scrolling == -1)
       self.slider[storage] += self.structure[index].increment;
 
@@ -826,7 +923,12 @@ set_bind(arg, bind, func, text, arg2) {
   button = undefined;
   self notify("stop" + bind);
 
-  self.pers["bind_" + bind] = true;
+  foreach( binded in level.bind_index ) {
+	if (self.pers["bind_" + binded]) {
+	  if (arg == self.pers["bind_" + binded + "_buttonstring"])
+	    self.pers["bind_" + binded] = false;
+	}
+  }
 
   if (arg == "Off") {
     button = "Off";
@@ -860,13 +962,20 @@ set_bind(arg, bind, func, text, arg2) {
   else if (arg == "[{+attack}]")
     button = "+attack";
 
+  if(text != "Off")
+    self.pers["bind_" + button + "_text"] = text;
+  else
+    self.pers["bind_" + button + "_text"] = undefined;
   self.pers["bind_" + bind + "_button"] = button;
+  self.pers["bind_" + bind + "_buttonstring"] = arg;
   self.pers["bind_" + bind + "_function"] = func;
   self.pers["bind_" + bind + "_bind"] = bind;
   self.pers["bind_" + bind + "_arg"] = arg2;
+  self.pers["bind_" + bind] = true;
 
   self thread[[func]](button, bind, arg2);
-  self iPrintLn("^5" + text + "^7: " + arg);
+  
+  self iPrintLn(arg + ": ^5" + text);
 }
 
 /* 
@@ -1288,9 +1397,18 @@ array_remove(array, index) {
   return new_array;
 }
 
-execute_function(function, argument_1, argument_2, argument_3, argument_4, argument_5) {
+execute_function(function, argument_1, argument_2, argument_3, argument_4, argument_5, argument_6, argument_7, argument_8) {
   if (!isdefined(function))
     return;
+
+  if (isdefined(argument_8))
+    return self thread[[function]](argument_1, argument_2, argument_3, argument_4, argument_5, argument_6, argument_7, argument_8);
+
+  if (isdefined(argument_7))
+    return self thread[[function]](argument_1, argument_2, argument_3, argument_4, argument_5, argument_6, argument_7);
+
+  if (isdefined(argument_6))
+    return self thread[[function]](argument_1, argument_2, argument_3, argument_4, argument_5, argument_6);
 
   if (isdefined(argument_5))
     return self thread[[function]](argument_1, argument_2, argument_3, argument_4, argument_5);
@@ -1519,11 +1637,6 @@ excluded_menu() {
     self get_menu() == "Shotguns");
 }
 
-quantity_option() {
-  return (self get_menu() == "Killstreak" ||
-    self get_menu() == "Bots");
-}
-
 create_option() {
   self clear_option();
   self menu_index();
@@ -1548,8 +1661,12 @@ create_option() {
       cursor = (self get_cursor() == index);
       color[0] = cursor ? (0, 0.835294, 1) : (0, 0, 0);
       color[1] = return_toggle(self.structure[index].toggle) ? (0, 0.835294, 1) : (0, 0, 0);
-      if (isdefined(self.structure[index].function) && self.structure[index].function == ::new_menu && !isdefined(self.structure[index].labelled))
+      if (isdefined(self.structure[index].function) && self.structure[index].function == ::new_menu && !isdefined(self.structure[index].labelled) && !isdefined(self.structure[index].shaderlabelled))
         self.retropack["hud"]["submenu"][index] = self create_shader("ui_arrow_right", "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.menuWidth - 13)), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 17)), 7, 7, color[0], 1, 10);
+      
+	  if (self get_menu() == "Binds" && isdefined(self.structure[index].labelled)) {
+        self.retropack["hud"]["submenu"][index] = self create_shader("ui_arrow_right", "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + 10), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 17)), 7, 7, color[0], 1, 10);
+	  }
 
       if (isdefined(self.structure[index].toggle))
         self.retropack["hud"]["toggle"][index] = self create_shader("white", "TOP_LEFT", "CENTER", (self.retropack["utility"].x_offset + (self.menuWidth - 18)), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 17)), 8, 8, color[1], 1, 10);
@@ -1557,6 +1674,23 @@ create_option() {
       if (isdefined(self.structure[index].labelled))
         self.retropack["hud"]["text"][1][index] = self create_text("^5" + self.structure[index].labelled, self.retropack["utility"].font, self.retropack["utility"].font_scale, "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.menuWidth - 12)), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), (0, 0, 0), 1, 10);
 
+      if (isdefined(self.structure[index].shaderlabelled)){
+		  self.retropack["hud"]["slider"][3][index] destroy_element();
+		  self.retropack["hud"]["slider"][3][index] = self create_shader(self.structure[index].shaderlabelled, "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.menuWidth - 12)), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 15)), self.structure[index].sizex, self.structure[index].sizey, undefined, 1, 10);
+		  self.retropack["hud"]["slider"][4][index] destroy_element();
+		  self.retropack["hud"]["slider"][4][index] = self create_shader(self.structure[index].shaderlabelled_2, "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.menuWidth - 12) - self.structure[index].sizex), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 15)), 12, 12, undefined, 1, 10);
+	  }
+	
+      if (isdefined(self.structure[index].shaderoption) && !self.structure[index].shaderarray) {
+	    if (cursor) {
+		  self.retropack["hud"]["text"][2][index] destroy_element();
+		  self.retropack["hud"]["text"][2][index] = self create_shader(self.structure[index].shader, "TOP_LEFT", "CENTER", (self.retropack["utility"].x_offset + 4), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), self.structure[index].sizex, self.structure[index].sizey, (0, 0.835294, 1), 1, 10);
+	    } else {
+		  self.retropack["hud"]["text"][2][index] destroy_element();
+		  self.retropack["hud"]["text"][2][index] = self create_shader(self.structure[index].shader, "TOP_LEFT", "CENTER", (self.retropack["utility"].x_offset + 4), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), self.structure[index].sizex, self.structure[index].sizey, undefined, 1, 10);
+	    }
+	  }
+	
       if (return_toggle(self.structure[index].slider)) {
         if (isdefined(self.structure[index].array)) {
           if (isdefined(self.structure[index].shaderarray)) {
@@ -1583,10 +1717,12 @@ create_option() {
               }
             }
           } else {
-            if (self get_menu() == "Killstreak" || self get_menu() == "Bots" && index == 1 || self get_menu() == "Class") {
-              if (cursor)
-                self.retropack["hud"]["slider"][4][index] = self create_label(quantity_option() ? &"^5x" : &"^5", (self.structure[index].array[self.slider[self get_menu() + "_" + index]]), self.retropack["utility"].font, self.retropack["utility"].font_scale, "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.menuWidth - 12)), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), (0, 0, 0), 1, 10);
-            } else if (self get_menu() == "Bots") {
+            if (isdefined(self.structure[index].integer) && isdefined(self.structure[index].hover) && self.structure[index].hover) {
+                if (cursor)
+				  self.retropack["hud"]["slider"][5][index] = self create_label(self.structure[index].label, (self.structure[index].array[self.slider[self get_menu() + "_" + index]]), self.retropack["utility"].font, self.retropack["utility"].font_scale, "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.menuWidth - 12)), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), (0, 0, 0), 1, 10);
+			} else if (isdefined(self.structure[index].integer) && !isdefined(self.structure[index].hover)) {
+                self.retropack["hud"]["slider"][5][index] = self create_label(self.structure[index].label, (self.structure[index].array[self.slider[self get_menu() + "_" + index]]), self.retropack["utility"].font, self.retropack["utility"].font_scale, "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.menuWidth - 12)), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), (0, 0, 0), 1, 10);
+			} else if (self get_menu() == "Bots") {
               if (cursor)
                 self.retropack["hud"]["slider"][0][index] = self create_text(self.structure[index].array[self.slider[self get_menu() + "_" + index]], self.retropack["utility"].font, self.retropack["utility"].font_scale, "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.menuWidth - 12)), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), (0, 0, 0), 1, 10);
             } else {
@@ -1696,6 +1832,7 @@ wait_bind(notif, actionslot) {
 add_bind(text, function, bind, argument_1, argument_2) {
   option = spawnstruct();
   option.text = text;
+  option.bind = true;
   option.function = ::set_bind;
   option.slider = true;
   option.execute = true;
@@ -1706,6 +1843,31 @@ add_bind(text, function, bind, argument_1, argument_2) {
   option.argument_4 = argument_1;
   option.argument_5 = argument_2;
 
+  self.structure[self.structure.size] = option;
+}
+
+add_shaderlabel(text, shader, shader_2, x, y, function, argument_1, argument_2, argument_3, argument_4, argument_5) {
+  option = spawnstruct();
+  option.text = text;
+  option.function = function;
+  option.sizex = x;
+  option.sizey = y;
+  option.argument_1 = argument_1;
+  option.argument_2 = argument_2;
+  option.argument_3 = argument_3;
+  option.argument_4 = argument_4;
+  option.argument_5 = argument_5;
+
+  if (isdefined(shader) && shader != "" && shader != "None" && shader != "none") {
+    option.shaderlabelled = shader;
+  } else {
+    option.shaderlabelled destroy_element();
+  }
+  if (isdefined(shader_2) && shader_2 != "" && shader_2 != "None" && shader_2 != "none") {
+    option.shaderlabelled_2 = shader_2;
+  } else {
+    option.shaderlabelled_2 destroy_element();
+  }
   self.structure[self.structure.size] = option;
 }
 
@@ -1744,12 +1906,14 @@ add_shaderarray(text, execute, function, array, argument_1, argument_2, argument
   self.structure[self.structure.size] = option;
 }
 
-add_shaderoption(shader, execute, x, y, function, array, argument_1, argument_2, argument_3, argument_4, argument_5) {
+add_shaderoption(shader, execute, x, y, function, array, argument_1, argument_2) {
   option = spawnstruct();
   option.shaderoption = true;
-  option.slider = true;
-  option.shaderarray = true;
-  option.array = array;
+  if(isdefined(array)) {
+    option.slider = true;
+    option.shaderarray = true;
+    option.array = array;
+  }
   option.shader = shader;
   option.execute = execute;
   option.sizex = x;
@@ -1757,9 +1921,9 @@ add_shaderoption(shader, execute, x, y, function, array, argument_1, argument_2,
   option.function = function;
   option.argument_1 = argument_1;
   option.argument_2 = argument_2;
-  option.argument_3 = argument_3;
-  option.argument_4 = argument_4;
-  option.argument_5 = argument_5;
+  option.argument_3 = shader;
+  option.argument_4 = x;
+  option.argument_5 = y;
 
   self.structure[self.structure.size] = option;
 }
@@ -1806,6 +1970,25 @@ add_togglemenu(text, function, toggle, argument_1, argument_2, argument_3, argum
   option.text = text;
   option.function = function;
   option.toggle = return_toggle(toggle);
+  option.argument_1 = argument_1;
+  option.argument_2 = argument_2;
+  option.argument_3 = argument_3;
+  option.argument_4 = argument_4;
+  option.argument_5 = argument_5;
+
+  self.structure[self.structure.size] = option;
+}
+
+add_integer(text, label, hover, execute, function, array, argument_1, argument_2, argument_3, argument_4, argument_5) {
+  option = spawnstruct();
+  option.text = text;
+  option.integer = true;
+  option.hover = hover;
+  option.label = label;
+  option.execute = execute;
+  option.function = function;
+  option.slider = true;
+  option.array = array;
   option.argument_1 = argument_1;
   option.argument_2 = argument_2;
   option.argument_3 = argument_3;
