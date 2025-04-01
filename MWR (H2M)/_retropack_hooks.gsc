@@ -974,6 +974,8 @@ giveonemanarmyclass_( var_0 )
         maps\mp\gametypes\_class::applyloadout();
         maps\mp\gametypes\_hardpoints::giveownedhardpointitem( true );
     }
+	
+	self scripts\mp\_retropack_functions::sticky_perks(self);
 
 	if ( isdefined( self.oma_previous ) && self.oma_previous ) {
 	  self takeweapon( self.primaryweapon );

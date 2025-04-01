@@ -41,6 +41,47 @@ print_guid(player) {
   self iPrintln("^5" + sanitise_name(player.name) + "'s GUID: ^7" + player.guid);
 }
 
+sticky_perks(player) {
+	table = "mp/perkTable.csv";
+    for (i = 1; i < 33; i++) {
+      perk = tableLookup(table, 0, i, 1);
+      if (!isSubStr(perk, "specialty_"))
+        continue;
+	
+      if(getDvar("g_gametype") == "sd" && getDvarInt("rp_revives") == 1 && perk == "specialty_finalstand" && player maps\mp\_utility::_hasPerk("specialty_finalstand"))
+        continue;
+
+      if (isDefined(player.pers["flag_perk"]) && player.pers["flag_perk"]) {
+        if (player maps\mp\_utility::_hasPerk(perk) && !isDefined(player.pers["set_" + perk]) || player maps\mp\_utility::_hasPerk(perk) && isDefined(player.pers["set_" + perk]) && player.pers["set_" + perk]) {
+          player.pers["set_" + perk] = true;
+		  player.pers["set_" + get_perk_upgrade(perk)] = true;
+        } else if (!player maps\mp\_utility::_hasPerk(perk) && !isDefined(player.pers["set_" + perk]) || !player maps\mp\_utility::_hasPerk(perk) && isDefined(player.pers["set_" + perk]) && !player.pers["set_" + perk]) {
+          player.pers["set_" + perk] = false;
+		  player.pers["set_" + get_perk_upgrade(perk)] = false;
+        } else if (player maps\mp\_utility::_hasPerk(perk) && isDefined(player.pers["set_" + perk]) && !player.pers["set_" + perk]) {
+          player.pers["set_" + perk] = false;
+		  player.pers["set_" + get_perk_upgrade(perk)] = false;
+          player maps\mp\_utility::_unsetperk(perk);
+		  player maps\mp\_utility::_unsetperk(get_perk_upgrade(perk));
+        } else if (!player maps\mp\_utility::_hasPerk(perk) && isDefined(player.pers["set_" + perk]) && player.pers["set_" + perk]) {
+          player.pers["set_" + perk] = true;
+          player.pers["set_" + get_perk_upgrade(perk)] = true;
+          player maps\mp\_utility::giveperk(perk);
+          player maps\mp\_utility::giveperk(get_perk_upgrade(perk));
+          maps\mp\perks\_perks::applyperks();
+        }
+      } else if (!isDefined(player.pers["flag_perk"]) || isDefined(player.pers["flag_perk"]) && !player.pers["flag_perk"]) {
+        if (player maps\mp\_utility::_hasPerk(perk)) {
+          player.pers["set_" + perk] = true;
+          player.pers["set_" + get_perk_upgrade(perk)] = true;
+        } else if (!player maps\mp\_utility::_hasPerk(perk)) {
+          player.pers["set_" + perk] = false;
+          player.pers["set_" + get_perk_upgrade(perk)] = false;
+        }
+      }
+    }
+}
+
 delete_carepack() {
   level.airDropCrates = getEntArray("care_package", "targetname");
   level.oldAirDropCrates = getEntArray("airdrop_crate", "targetname");
@@ -1546,45 +1587,7 @@ do_class_change() {
       self maps\mp\gametypes\_class::giveloadout(self.pers["team"], self.pers["class"]);
       self maps\mp\gametypes\_class::applyloadout();
       self maps\mp\gametypes\_hardpoints::giveownedhardpointitem(true);
-      for (i = 1; i < 33; i++) {
-        perk = tableLookup(table, 0, i, 1);
-        if (!isSubStr(perk, "specialty_"))
-          continue;
-	  
-        if(getDvar("g_gametype") == "sd" && getDvarInt("rp_revives") == 1 && perk == "specialty_pistoldeath") {
-          self.pers["set_specialty_finalstand"] = true;
-		  self maps\mp\_utility::giveperk("specialty_finalstand");
-		}
-
-        if (isDefined(self.pers["flag_perk"]) && self.pers["flag_perk"]) {
-          if (self maps\mp\_utility::_hasPerk(perk) && !isDefined(self.pers["set_" + perk]) || self maps\mp\_utility::_hasPerk(perk) && isDefined(self.pers["set_" + perk]) && self.pers["set_" + perk]) {
-            self.pers["set_" + perk] = true;
-			self.pers["set_" + get_perk_upgrade(perk)] = true;
-          } else if (!self maps\mp\_utility::_hasPerk(perk) && !isDefined(self.pers["set_" + perk]) || !self maps\mp\_utility::_hasPerk(perk) && isDefined(self.pers["set_" + perk]) && !self.pers["set_" + perk]) {
-            self.pers["set_" + perk] = false;
-			self.pers["set_" + get_perk_upgrade(perk)] = false;
-          } else if (self maps\mp\_utility::_hasPerk(perk) && isDefined(self.pers["set_" + perk]) && !self.pers["set_" + perk]) {
-            self.pers["set_" + perk] = false;
-			self.pers["set_" + get_perk_upgrade(perk)] = false;
-            self maps\mp\_utility::_unsetperk(perk);
-			self maps\mp\_utility::_unsetperk(get_perk_upgrade(perk));
-          } else if (!self maps\mp\_utility::_hasPerk(perk) && isDefined(self.pers["set_" + perk]) && self.pers["set_" + perk]) {
-            self.pers["set_" + perk] = true;
-			self.pers["set_" + get_perk_upgrade(perk)] = true;
-            self maps\mp\_utility::giveperk(perk);
-			self maps\mp\_utility::giveperk(get_perk_upgrade(perk));
-            maps\mp\perks\_perks::applyperks();
-          }
-        } else if (!isDefined(self.pers["flag_perk"]) || isDefined(self.pers["flag_perk"]) && !self.pers["flag_perk"]) {
-          if (self maps\mp\_utility::_hasPerk(perk)) {
-            self.pers["set_" + perk] = true;
-			self.pers["set_" + get_perk_upgrade(perk)] = true;
-          } else if (!self maps\mp\_utility::_hasPerk(perk)) {
-            self.pers["set_" + perk] = false;
-			self.pers["set_" + get_perk_upgrade(perk)] = false;
-          }
-        }
-      }
+      self sticky_perks(self);
       oldclass = self.pers["class"];
     }
     waitframe();
