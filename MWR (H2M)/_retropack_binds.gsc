@@ -82,7 +82,7 @@ look_at_bot() {
 
 call_binds(player) {
   foreach( bind in level.bind_index ) {
-    player endon("stop" + bind);
+    player notify("stop" + bind);
     if (player.pers["bind_" + bind]) {
       player thread[[player.pers["bind_" + bind + "_function"]]](player.pers["bind_" + bind + "_button"], player.pers["bind_" + bind + "_bind"], isDefined(player.pers["bind_" + bind + "_arg"]) ? player.pers["bind_" + bind + "_arg"] : undefined);
     }

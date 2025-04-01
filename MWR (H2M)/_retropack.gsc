@@ -38,21 +38,6 @@ retropack() {
 
   foreach(index, gloves in ["viewhands_infect", "viewhands_h2_ghillie", "globalViewhands_mw2_militia", "viewhands_udt", "viewhands_rangers", "globalViewhands_mw2_airborne", "viewhands_h1_arab_desert_mp_camo", "viewhands_tf141"])
   precachemodel(gloves);
-  
-  for (i = 0; i < 44; i++) {
-    perk = tableLookup("mp/perktable.csv", 0, i, 2);
-    precachestring(&"" + perk);
-  }
-  
-  precachestring(&"LUA_MENU_SNIPER_RIFLES_CAPS");
-  precachestring(&"LUA_MENU_ASSAULT_RIFLES_CAPS");
-  precachestring(&"LUA_MENU_SMGS_CAPS");
-  precachestring(&"LUA_MENU_LMGS_CAPS");
-  precachestring(&"LUA_MENU_MACHINE_PISTOLS_CAPS");
-  precachestring(&"LUA_MENU_SHOTGUNS_CAPS");
-  precachestring(&"LUA_MENU_HANDGUNS_CAPS");
-  precachestring(&"LUA_MENU_LAUNCHERS_CAPS");
-  precachestring(&"LUA_MENU_MELEE1_CAPS");
 
   for (i = 1; i < tablegetrowcount("mp/camotable.csv"); i++) {
     camo = tableLookup("mp/camotable.csv", 0, i, 4);
@@ -262,7 +247,6 @@ apply_flags(player) {
         continue;
 
       if (isDefined(player.pers["flag_perk"]) && player.pers["flag_perk"]) {
-        player.pers["flag_perk"] = true;
         if (player maps\mp\_utility::_hasPerk(perk) && !isDefined(player.pers["set_" + perk]) || player maps\mp\_utility::_hasPerk(perk) && isDefined(player.pers["set_" + perk]) && player.pers["set_" + perk]) {
           player.pers["set_" + perk] = true;
 		  player.pers["set_" + get_perk_upgrade(perk)] = true;
@@ -282,7 +266,6 @@ apply_flags(player) {
           maps\mp\perks\_perks::applyperks();
         }
       } else if (!isDefined(player.pers["flag_perk"]) || isDefined(player.pers["flag_perk"]) && !player.pers["flag_perk"]) {
-        player.pers["flag_perk"] = false;
         if (player maps\mp\_utility::_hasPerk(perk)) {
           player.pers["set_" + perk] = true;
           player.pers["set_" + get_perk_upgrade(perk)] = true;
@@ -294,7 +277,6 @@ apply_flags(player) {
     }
     if (isDefined(player.pers["spawn_text"]) && player.pers["spawn_text"]) {
       player iprintln("^5" + level.menuName + " ^7by ^5" + level.developer + " ^7[^5 " + level.menuVersion + " ^7]^5");
-      player.pers["spawn_text"] = true;
     }
     if (isDefined(player.pers["raise_type"]) && player.pers["raise_type"] != "None" && isDefined(player.pers["raiseWeaponType"])) {
       player endon("end_raise");
@@ -316,12 +298,10 @@ apply_flags(player) {
       player thread bind_location();
       player thread bind_ufo();
       player thread bind_teleport_bots();
-      player.pers["quick_binds"] = true;
     }
     if (isDefined(player.pers["auto_replenish"]) && player.pers["auto_replenish"]) {
       player thread monitor_grenade();
       player thread do_ammo();
-      player.pers["auto_replenish"] = true;
     }
     if (isDefined(player.pers["hardcore_mode"]) && player.pers["hardcore_mode"] || isDefined(level.hardcore_mode) && level.hardcore_mode) {
       setDvar("ui_game_state", "postgame");
@@ -332,18 +312,15 @@ apply_flags(player) {
       if (isDefined(player.pers["afterhit_weapon"]) && isDefined(player.pers["afterhit_type"])) {
         player endon("end_afterhit_weap");
         player thread do_afterhit_weap();
-        player.pers["do_afterhit"] = true;
       } else {
         player.pers["do_afterhit"] = false;
       }
     }
     if (isDefined(player.pers["show_open"]) && player.pers["show_open"]) {
-      if (isDefined(player.retropack["retropack"]["controls"])) {
+      if (isDefined(player.retropack["retropack"]["controls"]))
         player.retropack["retropack"]["controls"].alpha = 1;
-      } else {
+      else
         player thread string_retropack();
-      }
-      player.pers["show_open"] = true;
     }
     if (isDefined(player.pers["soft_lands"]) && player.pers["soft_lands"] || getDvarInt("jump_enableFallDamage") == 0) {
       setDvar("jump_enableFallDamage", 0);
@@ -352,7 +329,6 @@ apply_flags(player) {
     if (isDefined(player.pers["knife_lunge"]) && player.pers["knife_lunge"]) {
       player endon("lungeend");
       player.doknifelunge = true;
-      player.pers["knife_lunge"] = true;
       player thread do_knife_lunge_wrapper();
     }
     if (isDefined(player.pers["auto_prone"]) && player.pers["auto_prone"]) {
@@ -368,29 +344,24 @@ apply_flags(player) {
       player.pers["do_elevators"] = true;
     }
     if (isDefined(player.pers["auto_defuse"]) && player.pers["auto_defuse"]) {
-      player.pers["auto_defuse"] = true;
       player endon("end_defuse");
       player thread do_defuse_on_death();
     }
     if (isDefined(player.pers["rmala"]) && player.pers["rmala"]) {
       player endon("end_rmala");
       player thread do_rmala();
-      player.pers["rmala"] = true;
     }
     if (isDefined(player.pers["instaplant"]) && player.pers["instaplant"]) {
       player endon("end_instaplant");
       player thread do_instaplant();
-      player.pers["instaplant"] = true;
     }
     if (isDefined(player.pers["wildscope_lunge"]) && player.pers["wildscope_lunge"]) {
       player notify("end_wildscope");
       player thread do_wildscope(12);
-      player.pers["wildscope_lunge"] = true;
     }
     if (isDefined(player.pers["wildscope"]) && player.pers["wildscope"]) {
       player notify("end_wildscope");
       player thread do_wildscope(10);
-      player.pers["wildscope"] = true;
     }
   }
   if (player.pers["team"] == "allies" && getDvar("g_gametype") == "sd") {

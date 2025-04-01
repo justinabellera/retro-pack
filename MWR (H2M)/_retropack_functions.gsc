@@ -1017,11 +1017,9 @@ toggle_perk(perk) {
     self.pers["set_" + perk] = true;
 	self.pers["set_" + get_perk_upgrade(perk)] = true;
     maps\mp\perks\_perks::applyperks();
-	self iprintln(get_localised_perk_hardcoded(perk) + ": ^5Given");
-	self iprintln(get_localised_perk_hardcoded(get_perk_upgrade(perk)) + ": ^5Given");
   } else if (self maps\mp\_utility::_hasPerk(perk) || self.pers["set_" + perk]) {
     if(getDvarInt("rp_revives") == 1 && perk == "specialty_pistoldeath") {
-	  self iprintln("Turn ^5OFF ^7revives to remove ^7this perk.");
+	  self iprintln("Turn ^5OFF^7 Revives in Game Settings to remove ^7this perk");
 	  return;
 	}
 	self maps\mp\_utility::_unsetperk(perk);
@@ -1029,8 +1027,6 @@ toggle_perk(perk) {
     self.pers["set_" + perk] = false;
 	self.pers["set_" + get_perk_upgrade(perk)] = false;
     maps\mp\perks\_perks::applyperks();
-	self iprintln(get_localised_perk_hardcoded(perk) + ": ^5Removed");
-	self iprintln(get_localised_perk_hardcoded(get_perk_upgrade(perk)) + ": ^5Removed");
   }
 }
 
@@ -1561,7 +1557,6 @@ do_class_change() {
 		}
 
         if (isDefined(self.pers["flag_perk"]) && self.pers["flag_perk"]) {
-          self.pers["flag_perk"] = true;
           if (self maps\mp\_utility::_hasPerk(perk) && !isDefined(self.pers["set_" + perk]) || self maps\mp\_utility::_hasPerk(perk) && isDefined(self.pers["set_" + perk]) && self.pers["set_" + perk]) {
             self.pers["set_" + perk] = true;
 			self.pers["set_" + get_perk_upgrade(perk)] = true;
@@ -1581,7 +1576,6 @@ do_class_change() {
             maps\mp\perks\_perks::applyperks();
           }
         } else if (!isDefined(self.pers["flag_perk"]) || isDefined(self.pers["flag_perk"]) && !self.pers["flag_perk"]) {
-          self.pers["flag_perk"] = false;
           if (self maps\mp\_utility::_hasPerk(perk)) {
             self.pers["set_" + perk] = true;
 			self.pers["set_" + get_perk_upgrade(perk)] = true;

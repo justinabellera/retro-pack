@@ -430,18 +430,18 @@ menu_index() {
       self add_category("Give Weapon");
     }
     if (self.previous[self.previous.size - 1] == "Class") {
-	  self add_option(&"PERKS_NONE", ::select_weapon_rp, "None", retropack_storage(1, "Weapons"));
+	  self add_option("None", ::select_weapon_rp, "None", retropack_storage(1, "Weapons"));
       self add_category(retropack_storage(1, "Weapons"));
     }
-    self add_option(&"LUA_MENU_SNIPER_RIFLES_CAPS", ::new_menu, "Snipers", retropack_storage(1, "Weapons"));
-    self add_option(&"LUA_MENU_SHOTGUNS_CAPS", ::new_menu, "Shotguns", retropack_storage(1, "Weapons"));
-    self add_option(&"LUA_MENU_HANDGUNS_CAPS", ::new_menu, "Pistols", retropack_storage(1, "Weapons"));
-    self add_option(&"LUA_MENU_MACHINE_PISTOLS_CAPS", ::new_menu, "Machine Pistols", retropack_storage(1, "Weapons"));
-    self add_option(&"LUA_MENU_ASSAULT_RIFLES_CAPS", ::new_menu, "Assault Rifles", retropack_storage(1, "Weapons"));
-    self add_option(&"LUA_MENU_SMGS_CAPS", ::new_menu, "Submachine Guns", retropack_storage(1, "Weapons"));
-    self add_option(&"LUA_MENU_LMGS_CAPS", ::new_menu, "Light Machine Guns", retropack_storage(1, "Weapons"));
-    self add_option(&"LUA_MENU_LAUNCHERS_CAPS", ::new_menu, "Launchers", retropack_storage(1, "Weapons"));
-    self add_option(&"LUA_MENU_MELEE1_CAPS", ::new_menu, "Melee", retropack_storage(1, "Weapons"));
+    self add_option("Sniper Rifles", ::new_menu, "Snipers", retropack_storage(1, "Weapons"));
+    self add_option("Shotguns", ::new_menu, "Shotguns", retropack_storage(1, "Weapons"));
+    self add_option("Handguns", ::new_menu, "Pistols", retropack_storage(1, "Weapons"));
+    self add_option("Machine Pistols", ::new_menu, "Machine Pistols", retropack_storage(1, "Weapons"));
+    self add_option("Assault Rifles", ::new_menu, "Assault Rifles", retropack_storage(1, "Weapons"));
+    self add_option("Submachine Guns", ::new_menu, "Submachine Guns", retropack_storage(1, "Weapons"));
+    self add_option("Light Machine Guns", ::new_menu, "Light Machine Guns", retropack_storage(1, "Weapons"));
+    self add_option("Launchers", ::new_menu, "Launchers", retropack_storage(1, "Weapons"));
+    self add_option("Melee", ::new_menu, "Melee", retropack_storage(1, "Weapons"));
     if (self.previous[self.previous.size - 1] == "Home") {
       self add_option("Miscellaneous", ::new_menu, "Misc");
     }
@@ -642,9 +642,9 @@ menu_index() {
     self add_menu(menu);
     if (isDefined(self.pers["cacPrimaryConsole"]) && self.previous[self.previous.size - 1] == "Class" && is_launcher(self.pers["cacPrimaryConsole"]) ||
       isDefined(self.pers["cacSecondaryConsole"]) && self.previous[self.previous.size - 1] == "Class" && is_launcher(self.pers["cacSecondaryConsole"])) {
-      self add_option(&"PERKS_NONE", self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, "None", retropack_storage(1, "Camo"));
+      self add_option("None", self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, "None", retropack_storage(1, "Camo"));
     } else {
-	  self add_option(&"PERKS_NONE", self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, "None", retropack_storage(1, "Camo"));
+	  self add_option("None", self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, "None", retropack_storage(1, "Camo"));
       if(self.previous[self.previous.size - 1] == "Weapons")
 	    self add_option("Random", self.previous[self.previous.size - 1] == "Weapons" ? ::give_camo_rp : ::select_camo_rp, random_camo(true), retropack_storage(1, "Camo"));
 	  if(self.previous[self.previous.size - 1] == "Class" && isDefined(self.pers["cac" + retropack_storage(1, "Weapons") + "Shader"]) || self.previous[self.previous.size - 1] != "Class") {
@@ -678,7 +678,7 @@ menu_index() {
     break;
   case "Equipment":
     self add_menu(menu);
-    self add_option(&"PERKS_NONE", ::select_equipment_rp, "None");
+    self add_option("None", ::select_equipment_rp, "None");
 	self add_shaderoption("weapon_fraggrenade", false, 12, 12, ::select_equipment_rp, [ "h1_fraggrenade_mp;Frag Grenade" ], "weapon_fraggrenade");
 	self add_shaderoption("weapon_semtex", false, 12, 12, ::select_equipment_rp, [ "h2_semtex_mp;Semtex" ], "weapon_semtex");
 	self add_shaderoption("weapon_throwingknife", false, 12, 12, ::select_equipment_rp, [ "iw9_throwknife_mp;Throwing Knife" ], "weapon_throwingknife");
@@ -689,10 +689,10 @@ menu_index() {
     break;
   case "Offhand":
     self add_menu(menu);
-    self add_option(&"PERKS_NONE", ::select_offhand_rp, "None");
-    self add_option(&"WEAPON_SMOKE_GRENADE", ::select_offhand_rp, "h1_smokegrenade_mp;Smoke Grenade");
-    self add_option(&"WEAPON_STUN_GRENADE", ::select_offhand_rp, "h1_concussiongrenade_mp;Stun Grenade");
-    self add_option(&"WEAPON_FLASH_GRENADE", ::select_offhand_rp, "h1_flashgrenade_mp;Flash Grenade");
+    self add_option("None", ::select_offhand_rp, "None");
+    self add_option("Smoke Grenade", ::select_offhand_rp, "h1_smokegrenade_mp;Smoke Grenade");
+    self add_option("Stun Grenade", ::select_offhand_rp, "h1_concussiongrenade_mp;Stun Grenade");
+    self add_option("Flash Grenade", ::select_offhand_rp, "h1_flashgrenade_mp;Flash Grenade");
     break;
   case "Attachment":
     self add_menu(menu);
@@ -775,7 +775,7 @@ menu_index() {
     }
     for (i = 1; i < 33; i++) {
       perk = tableLookup("mp/perkTable.csv", 0, i, 1);
-	  name = get_localised_perk_hardcoded(perk);
+	  name = get_string_perk(perk);
       if (!isSubStr(perk, "specialty_"))
         continue;
 	
@@ -796,7 +796,7 @@ menu_index() {
         if (maps\mp\perks\_perks::validateperk(retropack_storage(1, "Perks") - 1, perk) == "specialty_null")
           continue;
 
-        self add_option(name, ::select_perk_rp, perk, name, retropack_storage(1, "Perks"));
+        self add_option(name, ::select_perk_rp, perk, get_string_perk(perk), retropack_storage(1, "Perks"));
       }
     }
     break;

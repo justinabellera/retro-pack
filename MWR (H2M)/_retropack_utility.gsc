@@ -1684,10 +1684,10 @@ create_option() {
       if (isdefined(self.structure[index].shaderoption) && !self.structure[index].shaderarray) {
 	    if (cursor) {
 		  self.retropack["hud"]["text"][2][index] destroy_element();
-		  self.retropack["hud"]["text"][2][index] = self create_shader(self.structure[index].shader, "TOP_LEFT", "CENTER", (self.retropack["utility"].x_offset + 4), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), self.structure[index].sizex, self.structure[index].sizey, (0, 0.835294, 1), 1, 10);
+		  self.retropack["hud"]["text"][2][index] = self create_shader(self.structure[index].shader, "TOP_LEFT", "CENTER", (self.retropack["utility"].x_offset + 14), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), self.structure[index].sizex, self.structure[index].sizey, (0, 0.835294, 1), 1, 10);
 	    } else {
 		  self.retropack["hud"]["text"][2][index] destroy_element();
-		  self.retropack["hud"]["text"][2][index] = self create_shader(self.structure[index].shader, "TOP_LEFT", "CENTER", (self.retropack["utility"].x_offset + 4), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), self.structure[index].sizex, self.structure[index].sizey, undefined, 1, 10);
+		  self.retropack["hud"]["text"][2][index] = self create_shader(self.structure[index].shader, "TOP_LEFT", "CENTER", (self.retropack["utility"].x_offset + 14), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), self.structure[index].sizex, self.structure[index].sizey, undefined, 1, 10);
 	    }
 	  }
 	
@@ -1709,11 +1709,14 @@ create_option() {
 
             if (isdefined(self.structure[index].shaderoption)) {
               if (cursor) {
+				self.retropack["hud"]["submenu"][index] destroy_element();
+				self.retropack["hud"]["submenu"][index] = self create_shader("ui_arrow_right", "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + 10), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 17)), 7, 7, color[0], 1, 10);
                 self.retropack["hud"]["text"][2][index] destroy_element();
-                self.retropack["hud"]["text"][2][index] = self create_shader(self.structure[index].shader, "TOP_LEFT", "CENTER", (self.retropack["utility"].x_offset + 4), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), self.structure[index].sizex, self.structure[index].sizey, (0, 0.835294, 1), 1, 10);
+                self.retropack["hud"]["text"][2][index] = self create_shader(self.structure[index].shader, "TOP_LEFT", "CENTER", (self.retropack["utility"].x_offset + 14), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), self.structure[index].sizex, self.structure[index].sizey, (0, 0.835294, 1), 1, 10);
               } else {
+                self.retropack["hud"]["submenu"][index] destroy_element();
                 self.retropack["hud"]["text"][2][index] destroy_element();
-                self.retropack["hud"]["text"][2][index] = self create_shader(self.structure[index].shader, "TOP_LEFT", "CENTER", (self.retropack["utility"].x_offset + 4), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), self.structure[index].sizex, self.structure[index].sizey, undefined, 1, 10);
+                self.retropack["hud"]["text"][2][index] = self create_shader(self.structure[index].shader, "TOP_LEFT", "CENTER", (self.retropack["utility"].x_offset + 14), (self.menuTOGap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), self.structure[index].sizex, self.structure[index].sizey, undefined, 1, 10);
               }
             }
           } else {
