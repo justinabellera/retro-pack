@@ -67,7 +67,7 @@ retropack() {
   level.menuName = "Retro Package";
   level.menuHeader = "RETRO_PACKAGE";
   level.menuSubHeader = "H2M";
-  level.menuVersion = "1.0.3";
+  level.menuVersion = "1.0.3A";
   level.developer = "@rtros";
 
   level thread retropack_binds();

@@ -921,22 +921,14 @@ set_shader(shader, width, height) {
 
 set_bind(arg, bind, func, text, arg2) {
   button = undefined;
-  self notify("stop" + bind);
-
-  foreach( binded in level.bind_index ) {
-	if (self.pers["bind_" + binded]) {
-	  if (arg == self.pers["bind_" + binded + "_buttonstring"])
-	    self.pers["bind_" + binded] = false;
-	}
-  }
 
   if (arg == "Off") {
     button = "Off";
-    self.pers["bind_" + bind] = false;
-    self.pers["bind_" + bind + "_button"] = undefined;
-    self.pers["bind_" + bind + "_function"] = undefined;
-    self.pers["bind_" + bind + "_bind"] = undefined;
-    self.pers["bind_" + bind + "_arg"] = undefined;
+    self.pers["bind_" + bind + button] = false;
+    self.pers["bind_" + bind + button + "_button"] = undefined;
+    self.pers["bind_" + bind + button + "_function"] = undefined;
+    self.pers["bind_" + bind + button + "_bind"] = undefined;
+    self.pers["bind_" + bind + button + "_arg"] = undefined;
   } else if (arg == "[{+actionslot 1}]")
     button = "+actionslot 1";
   else if (arg == "[{+actionslot 2}]")
@@ -962,16 +954,25 @@ set_bind(arg, bind, func, text, arg2) {
   else if (arg == "[{+attack}]")
     button = "+attack";
 
+  foreach( binded in level.bind_index ) {
+	if (self.pers["bind_" + binded + button]) {
+	  if (arg == self.pers["bind_" + binded + button + "_buttonstring"]) {
+	    self.pers["bind_" + binded + button] = false;
+	    self notify("stop" + binded + button);
+	  }
+	}
+  }
+
   if(text != "Off")
     self.pers["bind_" + button + "_text"] = text;
   else
     self.pers["bind_" + button + "_text"] = undefined;
-  self.pers["bind_" + bind + "_button"] = button;
-  self.pers["bind_" + bind + "_buttonstring"] = arg;
-  self.pers["bind_" + bind + "_function"] = func;
-  self.pers["bind_" + bind + "_bind"] = bind;
-  self.pers["bind_" + bind + "_arg"] = arg2;
-  self.pers["bind_" + bind] = true;
+  self.pers["bind_" + bind + button + "_button"] = button;
+  self.pers["bind_" + bind + button + "_buttonstring"] = arg;
+  self.pers["bind_" + bind + button + "_function"] = func;
+  self.pers["bind_" + bind + button + "_bind"] = bind;
+  self.pers["bind_" + bind + button + "_arg"] = arg2;
+  self.pers["bind_" + bind + button] = true;
 
   self thread[[func]](button, bind, arg2);
   

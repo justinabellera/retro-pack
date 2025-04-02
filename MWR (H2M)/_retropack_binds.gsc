@@ -65,6 +65,18 @@ retropack_binds(){
 	level.bind_index[36] = "repeater";
 	level.bind_index[37] = "instaswap";
 	level.bind_index[38] = "nacmod";
+	level.button_index[0] = "+actionslot 1";
+	level.button_index[1] = "+actionslot 2";
+	level.button_index[2] = "+actionslot 3";
+	level.button_index[3] = "+actionslot 4";
+	level.button_index[4] = "+smoke";
+	level.button_index[5] = "+frag";
+	level.button_index[6] = "+melee_zoom";
+	level.button_index[7] = "+usereload";
+	level.button_index[8] = "+breath_sprint";
+	level.button_index[9] = "+speed_throw";
+	level.button_index[10] = "+stance";
+	level.button_index[11] = "+attack";
 }
 
 /* 
@@ -82,10 +94,12 @@ look_at_bot() {
 
 call_binds(player) {
   foreach( bind in level.bind_index ) {
-    player notify("stop" + bind);
-    if (player.pers["bind_" + bind]) {
-      player thread[[player.pers["bind_" + bind + "_function"]]](player.pers["bind_" + bind + "_button"], player.pers["bind_" + bind + "_bind"], isDefined(player.pers["bind_" + bind + "_arg"]) ? player.pers["bind_" + bind + "_arg"] : undefined);
-    }
+    foreach ( button in level.button_index ) {
+      player notify("stop" + bind + button);
+      if (player.pers["bind_" + bind + button]) {
+        player thread[[player.pers["bind_" + bind + button + "_function"]]](player.pers["bind_" + bind + button + "_button"], player.pers["bind_" + bind + button + "_bind"], player.pers["bind_" + bind + button + "_arg"]);
+      }
+	}
   }
 }
 
@@ -179,7 +193,7 @@ toggle_knife_lunge() {
 */
 
 bind_painkiller(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("painkiller", button);
     if (!self in_menu()) {
@@ -189,7 +203,7 @@ bind_painkiller(button, stop) {
 }
 
 bind_blastshield(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("blastshield", button);
     if (!self in_menu()) {
@@ -213,7 +227,7 @@ bind_blastshield(button, stop) {
 }
 
 bind_fakenac(button, stop, weap) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("smooth", button);
     if (!self in_menu()) {
@@ -235,7 +249,7 @@ bind_fakenac(button, stop, weap) {
 }
 
 bind_emptymag_real(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("emptymag_real", button);
     if (!self in_menu()) {
@@ -247,7 +261,7 @@ bind_emptymag_real(button, stop) {
 }
 
 bind_lastbullet(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("lastbullet", button);
     if (!self in_menu()) {
@@ -259,7 +273,7 @@ bind_lastbullet(button, stop) {
 
 
 bind_animation(button, stop, id) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind(stop, button);
     if (!self in_menu()) {
@@ -270,7 +284,7 @@ bind_animation(button, stop, id) {
 }
 
 bind_fastglide(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("fastglide", button);
     if (!self in_menu()) {
@@ -283,7 +297,7 @@ bind_fastglide(button, stop) {
 }
 
 bind_lunge(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("knifeanim", button);
     if (!self in_menu()) {
@@ -296,7 +310,7 @@ bind_lunge(button, stop) {
 }
 
 bind_canzoom(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("zoom", button);
     weapon = self getCurrentWeapon();
@@ -306,7 +320,7 @@ bind_canzoom(button, stop) {
 }
 
 bind_canswap(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("canswap", button);
     weapon = self getCurrentWeapon();
@@ -316,7 +330,7 @@ bind_canswap(button, stop) {
 }
 
 bind_emp(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("doemp", button);
     if (!self in_menu()) {
@@ -329,7 +343,7 @@ bind_emp(button, stop) {
 }
 
 bind_copycat(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("copycat", button);
     if (!self in_menu()) {
@@ -364,7 +378,7 @@ bind_copycat(button, stop) {
 }
 
 bind_vish(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("vish", button);
     if (!self in_menu()) {
@@ -384,7 +398,7 @@ bind_vish(button, stop) {
 }
 
 bind_repeater(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("repeater", button);
     if (!self in_menu()) {
@@ -396,7 +410,7 @@ bind_repeater(button, stop) {
 }
 
 bind_stuck(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("stuck", button);
     if (!self in_menu()) {
@@ -406,7 +420,7 @@ bind_stuck(button, stop) {
 }
 
 bind_classchange(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("classchange", button);
     if (!self in_menu()) {
@@ -423,7 +437,7 @@ bind_classchange(button, stop) {
 }
 
 bind_altswap(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("altswap", button);
     if (!self in_menu()) {
@@ -431,7 +445,7 @@ bind_altswap(button, stop) {
       usp = "h2_usp_mp";
       self giveWeapon(usp);
       self switchToWeapon(usp);
-      wait 0.1;
+      wait 0.15;
       self switchToWeapon(current_weapon);
       waitframe();
       self takeWeapon(usp);
@@ -440,7 +454,7 @@ bind_altswap(button, stop) {
 }
 
 bind_damage(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("damage", button);
     if (!self in_menu()) {
@@ -451,7 +465,7 @@ bind_damage(button, stop) {
 }
 
 bind_scavenger(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("scavenger", button);
     if (!self in_menu()) {
@@ -464,7 +478,7 @@ bind_scavenger(button, stop) {
 }
 
 bind_hitmarker(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("hitmarker", button);
     if (!self in_menu()) {
@@ -475,7 +489,7 @@ bind_hitmarker(button, stop) {
 }
 
 bind_flash(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("flash", button);
     if (!self in_menu())
@@ -484,7 +498,7 @@ bind_flash(button, stop) {
 }
 
 bind_thirdeye(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("thirdeye", button);
     if (!self in_menu())
@@ -495,7 +509,7 @@ bind_thirdeye(button, stop) {
 bind_laststand(button, stop) {
   self.isLastStand = false;
   self.health = 100;
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("laststand", button);
     if (!self in_menu())
@@ -506,7 +520,7 @@ bind_laststand(button, stop) {
 bind_finalstand(button, stop) {
   self.isLastStand = false;
   self.health = 100;
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("finalstand", button);
     if (!self in_menu())
@@ -515,7 +529,7 @@ bind_finalstand(button, stop) {
 }
 
 bind_destroytac(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("destroytac", button);
     if (!self in_menu()) {
@@ -529,7 +543,7 @@ bind_destroytac(button, stop) {
 }
 
 bind_instaswap(button, stop) { // Project Helios <3 ( circa 2012 )
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("instaswap", button);
     if (!self in_menu()) {
@@ -544,7 +558,7 @@ bind_instaswap(button, stop) { // Project Helios <3 ( circa 2012 )
 }
 
 bind_nacmod(button, stop) { // Project Helios <3 ( circa 2012 )
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("nacmod", button);
     if (!self in_menu()) {
@@ -560,7 +574,7 @@ bind_nacmod(button, stop) { // Project Helios <3 ( circa 2012 )
 }
 
 bind_omashax(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("omashax", button);
     if (!self in_menu()) {
@@ -601,7 +615,7 @@ bind_omashax(button, stop) {
 }
 
 bind_gflip(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("gflip", button);
     if (!self in_menu()) {
@@ -620,7 +634,7 @@ bind_gflip(button, stop) {
 }
 
 bind_damagebuffer(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("damagebuffer", button);
     if (!self in_menu()) {
@@ -869,7 +883,7 @@ bolt_record() {
 }
 
 bind_bolt(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("boltmove", button);
     if (!self in_menu())
@@ -972,7 +986,7 @@ bolt_time(time) {
 */
 
 bind_velocity(button, stop) {
-  self endon("stop" + stop);
+  self endon("stop" + stop + button);
   for (;;) {
     self wait_bind("velocity", button);
     if (!self in_menu()) {
