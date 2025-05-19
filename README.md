@@ -1,9 +1,11 @@
-Call of Duty Mod Menu for various titles based on _GSC_.
+A Call of Duty Mod Menu developed by @rtros for various titles based on the _GSC Language_.
+</br>
 </br>
 ![alt text](https://pbs.twimg.com/media/GnNXX-LaQAAkV8V?format=jpg&name=large)
 </br>
 </br>**This mod contains Azza essentials across all compatible games**:
 </br>+ Auto-Spawn Bot Dummy
+</br>+ Console HUD (with Console Buttons)
 </br>+ Azza Mode (Real Match Bonus, XP Bar, Online XP, Classes, etc)
 </br>+ New and Improved Explosive Bullets Delay (Nearly Undetectable)
 </br>+ Quick Binds (UFO, Teleport Bots to Crosshairs, Load/Save Location)
@@ -68,7 +70,13 @@ Call of Duty Mod Menu for various titles based on _GSC_.
 </br>+ **_When will the mod for [game name] come out?_**
 </br>- See answer to the first question.
 </br>
+</br>
+</br>**Special Thanks:**
+</br> Simon, DoktorSAS, bbaaabaru, Roach
+</br>
 </br>**Preview:**
 </br>
-![alt text](https://pbs.twimg.com/media/FpEu_NbaYAA1GmV?format=jpg&name=large)
 ![alt text](https://pbs.twimg.com/media/GYEjrdIb0AMSMTu?format=jpg&name=large)
+![alt text](https://pbs.twimg.com/media/GqldWgGbcAEDiRS?format=jpg&name=large)
+![alt text](https://pbs.twimg.com/media/Gqlc9FSbcAAp2Ji?format=jpg&name=large)
+![alt text](https://pbs.twimg.com/media/Gq50PWHW4AEFrZ5?format=jpg&name=large)
