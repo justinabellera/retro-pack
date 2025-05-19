@@ -92,6 +92,9 @@ is_sniper(weapon) {
     isSubstr(weapon, "h2_barrett") ||
     isSubstr(weapon, "h2_wa2000") ||
     isSubstr(weapon, "h2_m21") ||
+    isSubstr(weapon, "h2_msr") ||
+    isSubstr(weapon, "h2_d25s") ||
+    isSubstr(weapon, "h2_as50") ||
     isSubstr(weapon, "h2_m40a3"));
 }
 
