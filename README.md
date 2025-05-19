@@ -55,7 +55,7 @@ A Call of Duty Mod Menu developed by _@rtros_ for various titles based on the _G
 </br>- Copy the contents of the "MWR (H2M)" folder to H2M/h2m-mod/scripts/mp/. Overwrite any existing files if prompted.
 </br>
 </br>+ _**MWR:HMW**_:
-</br>- Copy the contents of the "MWR (HMW)" folder to H2M/hmw-mod/scripts/mp/. Overwrite any existing files if prompted.
+</br>- Copy the contents of the "MWR (HMW)" folder to HMW/hmw-mod/scripts/mp/. Overwrite any existing files if prompted.
 </br>
 </br>
 </br>**FAQ:**
@@ -73,7 +73,7 @@ A Call of Duty Mod Menu developed by _@rtros_ for various titles based on the _G
 </br>
 </br>
 </br>**Special Thanks:**
-</br> Xeirh (Original Menu Base), Simon (Various Functions), DoktorSAS (Auto-Plant, Auto-Defuse), Roach (Black Ops), bbaaabaru (HMW)
+</br> Xeirh (Menu Foundation/Basis), Simon (Various Functions), DoktorSAS (Auto-Plant, Auto-Defuse), Roach (Black Ops), bbaaabaru (HMW)
 </br>
 </br>
 </br>**Menu Preview:**
