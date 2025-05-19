@@ -73,7 +73,7 @@ A Call of Duty Mod Menu developed by _@rtros_ for various titles based on the _G
 </br>
 </br>
 </br>**Special Thanks:**
-</br> Simon, DoktorSAS, bbaaabaru, Roach
+</br> Simon (Various Functions), DoktorSAS (Auto-Plant, Auto-Defuse), Roach (Black Ops), bbaaabaru (HMW)
 </br>
 </br>
 </br>**Menu Preview:**
