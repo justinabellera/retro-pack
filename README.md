@@ -2,13 +2,18 @@ Call of Duty Mod Menu for various titles based on _GSC_.
 </br>
 ![alt text](https://pbs.twimg.com/media/GnNXX-LaQAAkV8V?format=jpg&name=large)
 </br>
-</br>**This mod contains uniformed essentials across all compatible games which feature**:
-</br>+ Auto-Spawn Bot Dummy (1 by default, original code by _@ineedbots_)
-</br>+ Azza Lobby Mode (Match Bonus, Match Bonus Pop-Up, XP Bar, Online XP, etc)
-</br>+ Infinity Scroll UI
+</br>**This mod contains Azza essentials across all compatible games**:
+</br>+ Auto-Spawn Bot Dummy
+</br>+ Azza Mode (Real Match Bonus, XP Bar, Online XP, Classes, etc)
+</br>+ New and Improved Explosive Bullets Delay (Nearly Undetectable)
 </br>+ Quick Binds (UFO, Teleport Bots to Crosshairs, Load/Save Location)
-</br>+ Bolt Movement Menu (v2.0*) (Pathing is now carried over to the next round, original code by _@Sass_)
-</br>+ Velocity Menu
+</br>+ Trickshot Binds (Bolt, Velocity, Nac-Mod, Damage Buffer etc)
+</br>+ Always Menu (Always Can-Swap, Always Instashoot, Always Fast Glide, Always Mala etc)
+</br>+ Account Menu (Set Prestige, Unlock All, Overkill Classes, etc)
+</br>+ Afterhit Menu
+</br>+ Clip Cutting Menu
+</br>+ Game Settings (Health, Damage, Killcam Settings, DVARs, Timescale, etc)
+</br>+ In-Game Class Editor (IW5, H2M, HMW)
 </br>
 </br>
 </br>**Quick Bind Controls:**
@@ -19,14 +24,15 @@ Call of Duty Mod Menu for various titles based on _GSC_.
 </br>
 </br>
 </br>**Compatibility:**
-</br>+ **MW2 Mod Version (IW4x)**: 1.0.2b (_Updated July 7, 2024_)
-</br>+ **MW3 Mod Version (PlutoIW5)**: 1.0.2b (_Updated July 7, 2024_)
-</br>+ **BO1 Mod Version (Steam/Rekt/PlutoT5)**: 0.9.0 (_Updated June 5, 2022_)
+</br>+ **MW2 Mod Version (IW4x)**: 1.0.2b (_Updated July 7, 2024_) (Outdated)
+</br>+ **MW3 Mod Version (PlutoIW5)**: 1.0.2b (_Updated July 7, 2024_) (Outdated)
+</br>+ **BO1 Mod Version (Steam/Rekt/PlutoT5)**: 0.9.0 (_Updated June 5, 2022_) (Outdated)
 </br>+ **BO2 Mod Version (PlutoT6)**: _Planned_
-</br>+ **MWR:H2M Mod Version (H2M-Mod)**: 1.0.2a (_Updated March 30, 2024_)
+</br>+ **MWR:H2M Mod Version (H2M-Mod)**: 1.0.3a (_Updated April 2, 2025_)
+</br>+ **MWR:HMW Mod Version (HMW-Mod)**: 1.0.3b (_Updated May 19, 2025_)
 </br>+ **Ghosts Mod Version (IW6x)**: _WIP (Unreleased)_
 </br>+ **COD4 Mod Version (CoD4X)**: _Planned_
-</br>+ **WAW Mod Version (PlutoT4)**: _Planned_
+</br>+ **WAW Mod Version (PlutoT4)**: _WIP (Unreleased)_
 </br>
 </br>
 </br>**Installation:**
@@ -43,7 +49,10 @@ Call of Duty Mod Menu for various titles based on _GSC_.
 </br>- Copy the contents of the "Ghosts" folder to the root of your IW6x installation folder. Overwrite any existing files if prompted.
 </br>
 </br>+ _**MWR:H2M**_:
-</br>- Copy the contents of the "MWR (H2M)" folder to H2M/scripts/mp/. Overwrite any existing files if prompted.
+</br>- Copy the contents of the "MWR (H2M)" folder to H2M/h2m-mod/scripts/mp/. Overwrite any existing files if prompted.
+</br>
+</br>+ _**MWR:H2M**_:
+</br>- Copy the contents of the "MWR (HMW)" folder to H2M/hmw-mod/scripts/mp/. Overwrite any existing files if prompted.
 </br>
 </br>
 </br>**FAQ:**
