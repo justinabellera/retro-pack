@@ -611,7 +611,7 @@ apply_iw4_costumes_() {
   weapon = self.primaryweapon;
 
   if (isdefined(weapon))
-    weapon = maps\mp\_utility::getbaseweaponname(weapon);
+    weapon = scripts\mp\utility_patches::getbaseweaponname_stub(weapon);
 
   weaponClass = tablelookup("mp/statstable.csv", 4, weapon, 2);
 

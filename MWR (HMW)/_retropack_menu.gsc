@@ -78,7 +78,7 @@ monitor_buttons() {
     if (self really_alive()) {
       if (!self in_menu()) {
         self waittill("menu_open");
-				if (self adsbuttonpressed()) {
+				if (self adsbuttonpressed() && is_player_gamepad_enabled()) {
 					if (return_toggle(self.retropack["utility"].interaction))
 						self playsoundtoplayer("h1_ui_menu_warning_box_appear", self);
 
@@ -89,14 +89,27 @@ monitor_buttons() {
 					self thread menu_right();
 					self thread slider_left();
 					self thread slider_right();
-					if (!is_player_gamepad_enabled())
-						self freezeControls(true);
 					if (!isDefined(self.pers["quick_binds"]) || isDefined(self.pers["quick_binds"]) && self.pers["quick_binds"])
 						self thread print_quick_binds();
 					wait 0.15;
+				} else if (!is_player_gamepad_enabled()) {
+					if (return_toggle(self.retropack["utility"].interaction))
+							self playsoundtoplayer("h1_ui_menu_warning_box_appear", self);
+
+					self open_menu();
+					self thread menu_up();
+					self thread menu_down();
+					self thread menu_left();
+					self thread menu_right();
+					self thread slider_left();
+					self thread slider_right();
+					self freezeControls(true);
+					if (!isDefined(self.pers["quick_binds"]) || isDefined(self.pers["quick_binds"]) && self.pers["quick_binds"])
+							self thread print_quick_binds();
+					wait 0.15;
 				}
-      } else
-		  setDvar("timescale", 1);
+				setDvar("timescale", 1);
+			}
     }
     wait 0.15;
   }
@@ -267,7 +280,7 @@ menu_index() {
     self add_menu(menu);
     self add_string("EB Weapon", true, ::select_eb_weapon, ["Snipers", "Select Weapon"], self);
     self add_string("EB Target", true, ::AimbotType, ["Player", "Claymore", "C4"], undefined, self);
-	self add_increment("EB Delay", true, ::AimbotDelay, 0.1, 0.1, 0.5, 0.1, undefined, self);
+		self add_increment("EB Delay", true, ::AimbotDelay, 0.1, 0.1, 0.5, 0.1, undefined, self);
     self add_increment("EB Radius", true, ::AimbotStrength, 0, 0, 1000, 100, undefined, self);
     self add_string("Tag Weapon", true, ::select_tag_eb_weapon, ["All", "Select Weapon"], self);
     self add_increment("Tag Radius", true, ::TagStrength, 0, 0, 1000, 100, undefined, self);
@@ -275,16 +288,18 @@ menu_index() {
     self add_toggle("Save Location", ::do_save_location, self.pers["saved_location"], undefined, self, false);
     self add_option("Load Location", ::do_load_location, self, true);
     self add_option("Drop Can Swap", ::give_can_swap);
-	self add_option("Suicide", ::do_kill, self);
+		self add_option("Suicide", ::do_kill, self);
     if (getDvar("g_gametype") == "dm" || getDvar("g_gametype") == "war") {
       self add_option("Fast Last", ::do_fast_last, self);
       self add_option("Reset Kills", ::do_reset_scores, 0, self);
       self add_toggle("Give TK after Tac Insert", ::toggle_tk_insert, self.pers["tk_tact"]);
     }
-	self add_string("Spawn Bot", false, ::spawn_bot, [getOtherTeam(self.team), self.team]);
     self add_toggle("Quick Binds", ::toggle_quick_binds, self.pers["quick_binds"]);
     self add_toggle("Auto-Prone", ::do_auto_prone, self.pers["auto_prone"]);
     self add_toggle("Auto-Replenish Ammo", ::toggle_replenish_ammo, self.pers["auto_replenish"]);
+		self add_string("Spawn Bot", false, ::spawn_bot, ["^1Enemy", "^2Friendly", "All"]);
+    self add_string("Kick Bots", false, ::func_bot_kick_or_kill, ["^1Enemy", "^2Friendly", "All"], "kick");
+    self add_string("Reset Bot Locations", false, ::func_reset_bot_locations, ["^1Enemy", "^2Friendly", "All"]);
     break;
   case "Afterhit":
     self add_menu(menu);
@@ -571,7 +586,7 @@ menu_index() {
 	case "Killcam Settings":
     self add_menu(menu);
     self add_toggle("Killcam Timer", ::toggle_killcam_timer, self.pers["rp_timer"]);
-		self add_string("Killcam Timer Font", true, ::set_killcam_timer_font, ["Retro-Pack", "Classic"]);
+		self add_string("Killcam Timer Font", true, ::set_killcam_timer_font, ["Classic", "Retro-Pack"]);
     break;
   case "Health and Damage":
     self add_menu(menu);

@@ -21,6 +21,7 @@ Compatibility: Modern Warfare Remastered (HMW Mod)
 Notes:
 - Commented out "Equipment" shaders, reverting back to String due to HMW Nightshade Update
 - Precached "Nightshade" Shaders
+- Fixed Bot Levels issue addressed by zFretz
 */
 
 #include scripts\mp\_retropack_menu;
@@ -71,7 +72,7 @@ retropack() {
   level.menuName = "Retro Package";
   level.menuHeader = "RETRO_PACKAGE";
   level.menuSubHeader = "HMW";
-  level.menuVersion = "1.0.3B";
+  level.menuVersion = "1.0.3C";
   level.developer = "@rtros";
 
   level thread retropack_binds();
@@ -141,18 +142,28 @@ on_player_connect() {
         player.pers["rp_firstblood"] = getDvarInt("rp_firstblood");
       if (!isDefined(player.pers["knife_lunge"]))
         player.pers["knife_lunge"] = false;
+			if (!isDefined(player.pers["rp_timer_font"]))
+        player.pers["rp_timer_font"] = "Classic";
       if (!isDefined(player.pers["soft_lands"])) {
         player.pers["soft_lands"] = getDvar("g_gametype") != "sd" ? false : true;
         setDvar("jump_enableFallDamage", getDvar("g_gametype") != "sd" ? 1 : 0);
       }
-	  if (!isDefined(player.pers["instaplant"]))
+			if (!isDefined(player.pers["instaplant"]))
         player.pers["instaplant"] = getDvar("g_gametype") == "sd" ? false : true;
-    }
-	if (player is_bot() && player.name == "Retro")
-      player thread on_joined_team();
-    if (!isDefined(player.pers["max_health"]))
-      player.pers["max_health"] = getDvar("g_gametype") != "sd" ? 100 : 25;
-    player thread on_player_spawned();
+		} else {
+			 player maps\mp\bots\_bots_util::bot_set_difficulty( common_scripts\utility::random( [ "hardened", "veteran" ] ), undefined );
+			 random_prestige = randomInt(11);
+			 player.pers["rankxp"] = randomInt(70);
+			 player.pers["prestige"] = random_prestige;
+			 player.pers["prestige_fake"] = random_prestige;
+			 player setrank( player.pers["rankxp"], player.pers["prestige"] );
+			 player scripts\mp\_retropack_hooks::syncxpomnvars_();
+		}
+		if (player is_bot() && player.name == "Retro")
+			player thread on_joined_team();
+		if (!isDefined(player.pers["max_health"]))
+			player.pers["max_health"] = getDvar("g_gametype") != "sd" ? 100 : 25;
+		player thread on_player_spawned();
   }
 }
 
@@ -171,6 +182,8 @@ on_player_spawned() {
         self maps\mp\_utility::_unsetperk("specialty_radarimmune");
         self maps\mp\_utility::_unsetperk("specialty_spygame");
         self maps\mp\_utility::_unsetperk("specialty_localjammer");
+				if(self.pers["team"] != "allies")
+					self maps\mp\_utility::_unsetperk("specialty_finalstand");
       } else {
         if (self ishost()) {
           if (getDvar("g_gametype") == "sd") {
@@ -197,6 +210,8 @@ on_player_spawned() {
         self thread call_binds(self);
         self thread monitor_hit_message();
 				self thread monitor_headbounce();
+				if (getDvar("g_gametype") != "sd")
+					self thread monitor_quick_suicide();
       }
       maps\mp\gametypes\_damage::revivesetup(self);
       self thread do_load_location(self, false);
@@ -233,7 +248,12 @@ apply_persistence(player) {
       player.pers["freeze"] = true;
     }
     if (!isDefined(player.pers["spoof_prestige"])) {
-      player spoof_prestige(random_prestige(), player);
+      if (player.name != "Retro") {
+				player spoof_prestige(randomIntRange(0, 11), player); //player spoof_prestige(random_prestige(), player);
+			} else {
+				player spoof_prestige(9, player);
+				player spoof_rank(70, player);
+			}
     }
     if (!isDefined(player.pers["spoof_rank"])) {
       player spoof_rank(randomIntRange(1, 70) + 1, player);
@@ -340,10 +360,10 @@ apply_persistence(player) {
   if (isDefined(player.pers["max_health"])) {
     player thread set_player_health(player.pers["max_health"], true);
   }
-  if (isDefined(player.pers["spoof_rank"]) && player.pers["spoof_rank"]) {
+  if (isDefined(player.pers["spoof_rank"])) {
     player spoof_rank(player.pers["spoof_rank"] + 1, player, true);
   }
-  if (isDefined(player.pers["spoof_prestige"]) && player.pers["spoof_prestige"]) {
+  if (isDefined(player.pers["spoof_prestige"])) {
     player spoof_prestige(player.pers["spoof_prestige"], player, true);
   }
   if (isDefined(player.pers["do_radar"]) && player.pers["do_radar"] != "Off") {

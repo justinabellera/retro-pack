@@ -486,6 +486,17 @@ spawn_bot_wrapper(num, team) {
 spawn_bot(team, num, restart, delay) {
   if (!isDefined(num) || num == 0)
     num = 1;
+	
+	name = undefined;
+	if (team == "^2Friendly") {
+    name = "Friendly";
+		team = "allies";
+  } else if (team == "^1Enemy") {
+    name = "Enemy";
+		team = "axis";
+  } else if (team == "All") {
+    name = "All";
+	}
 
   if (team != "fill") {
     for (i = 0; i < num; i++) {
@@ -601,12 +612,52 @@ monitor_end_game() {
 }
 
 monitor_hit_message() {
-  while (true) {
+  self endon("disconnect");
+  self endon("death");
+  self endon("end_hit_message");
+  for (;;) {
+    bulletTraced = undefined;
+
     self waittill("weapon_fired");
-    self notify("end_hit_message");
-    self do_hit_message();
+    fwd = self getTagOrigin("tag_eye");
+    end = vector_scale(anglestoforward(self getPlayerAngles()), 1000000);
+    bulletLocation = BulletTrace(fwd, end, false, self)["position"];
+
+    foreach(player in level.players) {
+      if ((player == self) || (!isAlive(player)) || (level.teamBased && self.pers["team"] == player.pers["team"]))
+        continue;
+      if (isDefined(bulletTraced)) {
+        if (closer(bulletLocation, player getTagOrigin("tag_eye"), bulletTraced getTagOrigin("tag_eye")))
+          bulletTraced = player;
+      } else bulletTraced = player;
+    }
+
+    realDistance = int(distance(bulletTraced.origin, self.origin) * 0.0254);
+
+    if (is_sniper(self getCurrentWeapon()) && !self isOnGround()) {
+      if (distance(bulletTraced.origin, bulletLocation) <= 25) {
+        if (!isDefined(self.pers["explosive_bullets"]) || isDefined(self.pers["explosive_bullets"]) && self.pers["explosive_bullets"] == 0)
+          self iPrintLnBold("^5You almost hit ^7" + bulletTraced.name + "^5! [^7" + realDistance + " m^5]");
+      }
+    }
     waitframe();
   }
+}
+
+monitor_quick_suicide() {
+    self endon("disconnect");
+    self endon("death");
+		self endon("end_quick_suicide");
+    for(;;) {
+				self waittill("weapon_fired");
+        angles = self getPlayerAngles();
+        pitch = angles[0];
+        if(pitch > 78 && pitch <= 85) {
+            self suicide();
+            wait 1;
+        }
+        wait 0.1;
+    }
 }
 
 monitor_headbounce()
@@ -670,6 +721,7 @@ monitor_bots() { // could be better
     }
 
 	if (isDefined(self.pers["first_spawn"]) && self.pers["first_spawn"]){
+		waitframe();
 		if (level.bot_name[1] == "Retro" && level.teamBased)
 			level thread spawn_bot("allies", 1);
 		else
@@ -795,13 +847,16 @@ func_fast_restart() {
 }
 
 func_bot_kick_or_kill(team, type) {
-  name = undefined;
-  if (team == "allies")
+	name = undefined;
+	if (team == "^2Friendly") {
     name = "Friendly";
-  else if (team == "axis")
+		team = "allies";
+  } else if (team == "^1Enemy") {
     name = "Enemy";
-  else if (team == "All")
+		team = "axis";
+  } else if (team == "All") {
     name = "All";
+	}
 
   self iPrintln("^5" + name + " Bots ^7have been ^5" + type + "ed");
   self thread do_bot_kick_or_kill(team, type);
@@ -810,18 +865,47 @@ func_bot_kick_or_kill(team, type) {
 }
 
 func_randomise_bot_levels(team) {
-  name = undefined;
-  if (team == "allies")
+	name = undefined;
+	if (team == "^2Friendly") {
     name = "Friendly";
-  else if (team == "axis")
+		team = "allies";
+  } else if (team == "^1Enemy") {
     name = "Enemy";
-  else if (team == "All")
+		team = "axis";
+  } else if (team == "All") {
     name = "All";
+	}
 
   self thread spoof_bot_level(team);
   self iPrintln("^5" + name + " Bot ^7levels have been ^5randomised");
   wait 1.5;
   self notify("LevelFinish");
+}
+
+func_reset_bot_locations(team) {
+	name = undefined;
+	if (team == "^2Friendly") {
+    name = "Friendly";
+		team = "allies";
+  } else if (team == "^1Enemy") {
+    name = "Enemy";
+		team = "axis";
+  } else if (team == "All") {
+    name = "All";
+	}
+	for (i = 0; i < level.players.size; i++) {
+    if (isSubStr(level.players[i].guid, "bot")) {
+			if(team == "All") {
+				level.players[i].pers["saved_location"] = false;
+			} else {
+				if (level.players[i].pers["team"] == team) {
+					level.players[i].pers["saved_location"] = false;
+				}
+			}
+    }
+  }
+	waitframe();
+	self iPrintln("^5" + name + "^7 Bot saved locations have been ^5reset");
 }
 
 /* 
@@ -1563,39 +1647,6 @@ do_class_change() {
       self maps\mp\gametypes\_hardpoints::giveownedhardpointitem(true);
       self sticky_perks(self);
       oldclass = self.pers["class"];
-    }
-    waitframe();
-  }
-}
-
-do_hit_message() {
-  self endon("disconnect");
-  self endon("death");
-  self endon("end_hit_message");
-  for (;;) {
-    bulletTraced = undefined;
-
-    self waittill("weapon_fired");
-    fwd = self getTagOrigin("tag_eye");
-    end = vector_scale(anglestoforward(self getPlayerAngles()), 1000000);
-    bulletLocation = BulletTrace(fwd, end, false, self)["position"];
-
-    foreach(player in level.players) {
-      if ((player == self) || (!isAlive(player)) || (level.teamBased && self.pers["team"] == player.pers["team"]))
-        continue;
-      if (isDefined(bulletTraced)) {
-        if (closer(bulletLocation, player getTagOrigin("tag_eye"), bulletTraced getTagOrigin("tag_eye")))
-          bulletTraced = player;
-      } else bulletTraced = player;
-    }
-
-    realDistance = int(distance(bulletTraced.origin, self.origin) * 0.0254);
-
-    if (is_sniper(self getCurrentWeapon()) && !self isOnGround()) {
-      if (distance(bulletTraced.origin, bulletLocation) <= 25) {
-        if (!isDefined(self.pers["explosive_bullets"]) || isDefined(self.pers["explosive_bullets"]) && self.pers["explosive_bullets"] == 0)
-          self iPrintLnBold("^5You almost hit ^7" + bulletTraced.name + "^5! [^7" + realDistance + " m^5]");
-      }
     }
     waitframe();
   }
@@ -2451,7 +2502,7 @@ spoof_prestige(value, player, spawn) {
     player.pers["spoof_prestige"] = "em_st_180";
     player setclientomnvar("ui_player_xp_prestige", 10);
     player.pers["rank"] = 999;
-    player setclientomnvar("ui_player_xp_rank", 999);
+    player setclientomnvar("ui_player_xp_rank", 999);  
     player setrank(999, 10);
   }
 }
@@ -2604,7 +2655,7 @@ select_perk_rp(perk, name, num) {
     self.pers["cacPerkName" + num] = undefined;
     return;
   } else {
-    self.pers["cacPerk" + num] = perk;
+    self.pers["cacPerk" + num] = get_perk_upgrade(perk);
     self.pers["cacPerkName" + num] = name;
   }
   if (perk == "none")
@@ -2676,7 +2727,7 @@ select_weapon_rp(weapon, type, name, shader, x, y) {
   self.pers["cac" + type + "CamoID"] = undefined;
   self.pers["cac" + type + "CamoName"] = undefined;
 
-  self.pers["cac" + type + "Base"] = getbaseweaponname(weapon);
+  self.pers["cac" + type + "Base"] = scripts\mp\utility_patches::getbaseweaponname_stub(weapon);
   self.pers["cac" + type + "Attachment1"] = maps\mp\gametypes\_class::attachkitnametoid(extract_attachment(weapon) == "acog" ? "acogh2" : extract_attachment(weapon));
   self.pers["cac" + type + "Attachment1Console"] = extract_attachment(weapon);
   self.pers["cac" + type + "Attachment1Shader"] = get_attachment(extract_attachment(weapon));
