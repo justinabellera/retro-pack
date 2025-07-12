@@ -639,7 +639,6 @@ menu_index() {
     break;
   case "Admin":
     self add_menu(menu);
-    self add_option("Account Menu", ::new_menu, "Account");
     self add_option("Perk Menu", ::new_menu, "Perks");
     self add_divider();
     self add_string("Select Hand Model", true, ::set_viewhand_model, ["Ghillie", "Infected", "Militia", "SEALs", "TF141", "Rangers", "Spetsnaz", "OpFor"]);
@@ -655,15 +654,6 @@ menu_index() {
     self add_integer("Spoof Prestige", &"^5", undefined, false, ::spoof_prestige, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1000], self, false);
     self add_integer("Spoof Level", &"^5", undefined, false, ::spoof_rank, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70], self, false);
     self add_increment("Spoof XP Progress", false, ::spoof_xp_bar, 0, 0, 100, 5, self, false);
-    break;
-  case "Account":
-    self add_menu(menu);
-    //self add_shaderarray("Set Prestige", false, ::set_prestige, ["rank_comm", "h2m_rank_prestige1", "h2m_rank_prestige2", "h2m_rank_prestige3", "h2m_rank_prestige4", "h2m_rank_prestige5", "h2m_rank_prestige6", "h2m_rank_prestige7", "h2m_rank_prestige8", "h2m_rank_prestige9", "h2m_rank_prestige10", "h2m_cheytac_ui"], 2515999);
-		self add_integer("Set Prestige", &"^5", undefined, false, ::set_prestige, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 2515999);
-    self add_option("Derank", ::set_prestige, 0, 0);
-    self add_option("Unlock All", ::set_challenges);
-    self add_string("Overkill Classes", false, ::set_overkill_classes, ["Snipers", "AR", "SMG"]);
-    self add_toggle("Coloured Classes", ::set_coloured_classes, self.colouredClasses);
     break;
   case "Camo":
     self add_menu(menu);
@@ -685,12 +675,14 @@ menu_index() {
     break;
   case "Class":
     self add_menu(menu);
-	self add_shaderlabel("Primary:", self.pers["cacPrimaryShader"], self.pers["cacPrimaryAttachment1Shader"], self.pers["cacPrimaryShaderX"], self.pers["cacPrimaryShaderY"], ::new_menu, "Weapons", "Primary");
-    self add_shaderlabel("2nd Attachment:", self.pers["cacPrimaryAttachment2Shader"], undefined, self.pers["cacPrimaryAttachment2ShaderX"], self.pers["cacPrimaryAttachment2ShaderY"], ::new_menu, "Attachment", "Primary");
+	self add_shaderlabel("Primary:", self.pers["cacPrimaryShader"], undefined, self.pers["cacPrimaryShaderX"], self.pers["cacPrimaryShaderY"], ::new_menu, "Weapons", "Primary");
+    self add_label("Attachment 2:", self.pers["cacPrimaryAttachment2Name"], ::new_menu, "Attachment", "Primary");
+		//self add_shaderlabel("2nd Attachment:", self.pers["cacPrimaryAttachment2Shader"], undefined, self.pers["cacPrimaryAttachment2ShaderX"], self.pers["cacPrimaryAttachment2ShaderY"], ::new_menu, "Attachment", "Primary");
     self add_shaderlabel("Camo:", self.pers["cacPrimaryCamoShader"], undefined, self.pers["cacPrimaryCamoShaderX"], self.pers["cacPrimaryCamoShaderY"], ::new_menu, "Camo", "Primary");
     self add_divider();
-	self add_shaderlabel("Secondary:", self.pers["cacSecondaryShader"], self.pers["cacSecondaryAttachment1Shader"], self.pers["cacSecondaryShaderX"], self.pers["cacSecondaryShaderY"], ::new_menu, "Weapons", "Secondary");
-    self add_shaderlabel("2nd Attachment:", self.pers["cacSecondaryAttachment2Shader"], undefined, self.pers["cacSecondaryAttachment2ShaderX"], self.pers["cacSecondaryAttachment2ShaderY"], ::new_menu, "Attachment", "Secondary");
+	self add_shaderlabel("Secondary:", self.pers["cacSecondaryShader"], undefined, self.pers["cacSecondaryShaderX"], self.pers["cacSecondaryShaderY"], ::new_menu, "Weapons", "Secondary");
+    self add_label("Attachment 2:", self.pers["cacSecondaryAttachment2Name"], ::new_menu, "Attachment", "Secondary");
+		//self add_shaderlabel("2nd Attachment:", self.pers["cacSecondaryAttachment2Shader"], undefined, self.pers["cacSecondaryAttachment2ShaderX"], self.pers["cacSecondaryAttachment2ShaderY"], ::new_menu, "Attachment", "Secondary");
     self add_shaderlabel("Camo:", self.pers["cacSecondaryCamoShader"], undefined, self.pers["cacSecondaryCamoShaderX"], self.pers["cacSecondaryCamoShaderY"], ::new_menu, "Camo", "Secondary");
     self add_divider();
 	//self add_shaderlabel("Equipment:", self.pers["cacEquipmentShader"], undefined, 12, 12, ::new_menu, "Equipment");
@@ -799,7 +791,8 @@ menu_index() {
       if (isSubStr((retropack_storage(1, "Attachment") == "Primary") ? self.pers["cacPrimaryBase"] : self.pers["cacSecondaryBase"], "h2_aug") && i == 14) {
         continue;
       }
-		self add_shaderoption(get_attachment(attachment), false, 12, 12, ::select_attachment_rp, undefined, attachment, retropack_storage(1, "Weapons"), get_attachment(attachment));
+			self add_option(get_localised_attachment(attachment), ::select_attachment_rp, attachment, retropack_storage(1, "Attachment"));
+		//self add_shaderoption(get_attachment(attachment), false, 12, 12, ::select_attachment_rp, undefined, attachment, retropack_storage(1, "Weapons"), get_attachment(attachment));
     }
     break;
   case "Perks":

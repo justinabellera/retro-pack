@@ -2217,64 +2217,6 @@ set_bots_aim() {
   }
 }
 
-set_overkill_classes(type) {
-  for (i = 0; i < 15; i++) {
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", i, "name", sanitise_name(self.name) + " ^5Overkill");
-
-    if (type == "Snipers") {
-      self setCacPlayerData(i, "weaponSetups", 1, "weapon", random_sniper());
-      self setCacPlayerData(i, "weaponSetups", 1, "camo", random_camo(false));
-      self setCacPlayerData(i, "weaponSetups", 1, "kit", "attachKit", scripts\mp_patches\custom_weapons::furniturekitnametoid(random_kit(random_sniper() + "_mp")));
-      self setCacPlayerData(i, "weaponSetups", 1, "kit", "furnitureKit", scripts\mp_patches\custom_weapons::furniturekitnametoid(random_kit(random_sniper() + "_mp")));
-    } else if (type == "AR") {
-      self setCacPlayerData(i, "weaponSetups", 1, "weapon", random_ar());
-      self setCacPlayerData(i, "weaponSetups", 1, "camo", random_camo(false));
-      self setCacPlayerData(i, "weaponSetups", 1, "kit", "attachKit", scripts\mp_patches\custom_weapons::furniturekitnametoid(random_kit(random_ar() + "_mp")));
-      self setCacPlayerData(i, "weaponSetups", 1, "kit", "furnitureKit", scripts\mp_patches\custom_weapons::furniturekitnametoid(random_kit(random_ar() + "_mp")));
-    } else if (type == "SMG") {
-      self setCacPlayerData(i, "weaponSetups", 1, "weapon", random_smg());
-      self setCacPlayerData(i, "weaponSetups", 1, "camo", random_camo(false));
-      self setCacPlayerData(i, "weaponSetups", 1, "kit", "attachKit", scripts\mp_patches\custom_weapons::furniturekitnametoid(random_kit(random_smg() + "_mp")));
-      self setCacPlayerData(i, "weaponSetups", 1, "kit", "furnitureKit", scripts\mp_patches\custom_weapons::furniturekitnametoid(random_kit(random_smg() + "_mp")));
-    }
-  }
-  self iPrintln("^5RETROPACK: ^7Random " + type + " Overkill Classes Set");
-}
-
-set_coloured_classes() {
-  if (!self.colouredClasses) {
-    self.colouredClasses = true;
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 0, "name", "^1" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 1, "name", "^2" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 2, "name", "^3" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 3, "name", "^4" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 4, "name", "^5" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 5, "name", "^6" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 6, "name", "^7" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 7, "name", "^8" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 8, "name", "^9" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 9, "name", "^2" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 10, "name", "^3" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 11, "name", "^4" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 12, "name", "^5" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 13, "name", "^6" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", 14, "name", "^7" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_private(), "privateMatchCustomClasses", 0, "name", "^1" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_private(), "privateMatchCustomClasses", 1, "name", "^2" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_private(), "privateMatchCustomClasses", 2, "name", "^3" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_private(), "privateMatchCustomClasses", 3, "name", "^4" + sanitise_name(self.name));
-    self setplayerdata(common_scripts\utility::getstatsgroup_private(), "privateMatchCustomClasses", 4, "name", "^5" + sanitise_name(self.name));
-    self iPrintLn("^1C^2O^3L^4O^5U^6R^7E^8D ^9C^1L^2A^3S^5S ^6N^7A^8M^9E^1S ^2S^3E^4T");
-  } else if (self.colouredClasses) {
-    self.colouredClasses = false;
-    for (i = 0; i < 15; i++) {
-      self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "customClasses", i, "name", "Custom Slot " + (i + 1));
-      self setplayerdata(common_scripts\utility::getstatsgroup_private(), "privateMatchCustomClasses", i, "name", "Custom Slot " + (i + 1));
-    }
-    self iPrintln("b o r i n g class names set");
-  }
-}
-
 set_prestige(prestige, experience) {
   if (prestige == "rank_comm" || prestige == 0)
     prestige = 0;
@@ -2314,41 +2256,6 @@ set_prestige(prestige, experience) {
     self iPrintLn("^5" + sanitise_name(self.name) + "^7: ^5Prestige " + prestige);
 
   wait 1.5;
-  setDvar("xblive_privatematch", 1);
-  exitLevel(0);
-}
-
-set_challenges() {
-  self endon("disconnect");
-  self endon("death");
-  self.pers["god_mode"] = true;
-  chalProgress = 0;
-  useBar = createPrimaryProgressBar(25);
-	if (self in_menu())
-		self close_menu();
-  foreach(challengeRef, challengeData in level.challengeInfo) {
-    finalTarget = 0;
-    finalTier = 0;
-    for (tierId = 1; isDefined(challengeData["targetval"][tierId]); tierId++) {
-      finalTarget = challengeData["targetval"][tierId];
-      finalTier = tierId + 1;
-    }
-    if (self isItemUnlocked(challengeRef)) {
-      self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "challengeProgress", challengeRef, finalTarget);
-      self setplayerdata(common_scripts\utility::getstatsgroup_ranked(), "challengeState", challengeRef, finalTier);
-    }
-    chalProgress++;
-    chalPercent = ceil(((chalProgress / level.challengeInfo.size) * 100));
-    useBar updateBar(chalPercent / 100);
-    waitframe();
-  }
-  self maps\mp\gametypes\_rank::giverankxp(undefined, 99999999, undefined, undefined, false);
-  self maps\mp\gametypes\_persistence::statset("experience", 99999999);
-  self maps\mp\gametypes\_persistence::statset("prestige", 10);
-  useBar destroyElem();
-  self iPrintLnBold("Unlock All Completed");
-  wait 1.5;
-  self.pers["god_mode"] = false;
   setDvar("xblive_privatematch", 1);
   exitLevel(0);
 }

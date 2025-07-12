@@ -881,10 +881,15 @@ set_slider(scrolling, index) {
 
     if (isdefined(self.structure[index].shaderarray)) {
       sep = strTok(self.structure[index].array[self.slider[storage]], ";");
-      if (self get_menu() == "Camo")
+      if (self get_menu() == "Camo") {
         self.retropack["hud"]["slider"][3][index] setShader(sep[1], 12, 12);
-      else
-        self.retropack["hud"]["slider"][3][index] setShader(excluded_menu() ? get_attachment(sep[0]) : self.structure[index].array[self.pers["storage_array" + menu + index]], 12, 12);
+      } else {
+				if ( excluded_menu() )
+					self.retropack["hud"]["slider"][0][index] set_text("^5" + get_localised_attachment(extract_attachment(sep[0])));
+				else
+					self.retropack["hud"]["slider"][3][index] setShader(self.structure[index].array[self.pers["storage_array" + menu + index]], 12, 12);
+			}
+       // self.retropack["hud"]["slider"][3][index] setShader(excluded_menu() ? get_attachment(sep[0]) : self.structure[index].array[self.pers["storage_array" + menu + index]], 12, 12);
     } else {
 	  if (isdefined(self.structure[index].integer)) {
 	    self.retropack["hud"]["slider"][5][index] setValue(self.structure[index].array[self.pers["storage_array" + menu + index]]);
@@ -1839,7 +1844,9 @@ create_option(animation) {
               } else if (self get_menu() == "Admin" || self get_menu() == "Account" || isSubStr(self get_menu(), "Player_")) {
                 self.retropack["hud"]["slider"][3][index] = self create_shader(sep[1], "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.retropack["utility"].menu_width - 8)), (self.retropack["utility"].menu_title_gap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 15)), 8, 8, undefined, 1, 10);
               } else
-                self.retropack["hud"]["slider"][3][index] = self create_shader(excluded_menu() ? get_attachment(sep[0]) : self.structure[index].array[self.slider[self get_menu() + "_" + index]], "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.retropack["utility"].menu_width - 12)), (self.retropack["utility"].menu_title_gap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 18)), 12, 12, undefined, 1, 10);
+								self.retropack["hud"]["slider"][0][index] = self create_text("^5" + get_localised_attachment(extract_attachment(self.structure[index].array[self.slider[self get_menu() + "_" + index]])), self.retropack["utility"].font, self.retropack["utility"].font_scale, "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.retropack["utility"].menu_width - 12)), (self.retropack["utility"].menu_title_gap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 16)), (0, 0, 0), 1, 10);
+								// get_localised_attachment
+                //self.retropack["hud"]["slider"][3][index] = self create_shader(excluded_menu() ? get_attachment(sep[0]) : self.structure[index].array[self.slider[self get_menu() + "_" + index]], "TOP_RIGHT", "CENTER", (self.retropack["utility"].x_offset + (self.retropack["utility"].menu_width - 12)), (self.retropack["utility"].menu_title_gap + self.retropack["utility"].y_offset + ((i * self.retropack["utility"].option_spacing) + 18)), 12, 12, undefined, 1, 10);
             } else {
               self.retropack["hud"]["slider"][3][index] destroy_element();
             }
