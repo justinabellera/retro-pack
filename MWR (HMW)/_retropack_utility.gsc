@@ -501,6 +501,8 @@ get_localised_attachment(attachment) {
     return "Thermal";
   else if (attachment == "xmag")
     return "X-Mags";
+	else if (attachment == "heartbeat")
+    return "Heartbeat";
 }
 
 get_localised_perk(perk) {
@@ -1375,6 +1377,8 @@ extract_attachment(weapon) {
     return "silencersmg";
   if (isEndStr(sep[0], "_akimbo"))
     return "akimbo";
+	if (isEndStr(sep[0], "_heartbeat"))
+    return "heartbeat";
   if (isEndStr(sep[0], "_silencerlmg"))
     return "silencerlmg";
   if (isEndStr(sep[0], "_silencersniper"))
